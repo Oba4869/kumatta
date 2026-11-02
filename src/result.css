@@ -1,0 +1,162 @@
+/* =====================================================================
+   Result screen
+   - wide: 12-column grid, 7 | 5 like the start screen
+     left  = the outcome and what to learn from it (text-heavy, the "heavy" side)
+     right = next action, then progress (light)
+   - small: outcome → review → progress, buttons pinned at the bottom
+   ===================================================================== */
+.panel.result{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--sp-4);row-gap:var(--sp-5);align-items:start}
+.result>*{grid-column:1/-1;min-width:0}
+.rs-main,.rs-side{display:contents}
+.rs-main>*,.rs-side>*{grid-column:1/-1;min-width:0}
+.result p,.result .items p,.result .ghint,.result .rs-line{text-wrap:pretty;word-break:auto-phrase}
+
+/* order on small screens */
+.rs-verdict{order:1}.rs-review{order:2}.rs-progress{order:3}.result .collection{order:4}.rs-actions{order:9}
+
+/* ---------- headings ---------- */
+.rs-h{margin:0;font-size:var(--fs-md);font-weight:800;line-height:var(--lh-tight)}
+.rs-sub{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-sm);font-weight:700;color:var(--c-text-2)}
+.rs-sub .sec-hint{margin-left:auto;font-weight:500}
+.rs-n{min-width:20px;height:20px;padding:0 6px;border-radius:var(--r-full);display:inline-grid;place-items:center;font-size:var(--fs-xs);background:var(--c-sunk);color:var(--c-text)}
+
+/* ---------- verdict card ---------- */
+.result .rs-verdict{position:relative;overflow:hidden;display:flex;flex-direction:column;gap:var(--sp-4);padding:var(--sp-5);
+  border-radius:var(--r-lg);border:1px solid var(--c-line);background:var(--c-surface);box-shadow:var(--shadow-1)}
+.result .rs-verdict.r-S,.result .rs-verdict.r-A{background:radial-gradient(120% 140% at 0% 0%,var(--c-gold-soft),transparent 55%),var(--c-surface)}
+.result .rs-verdict.r-C{background:radial-gradient(120% 140% at 0% 0%,var(--c-bad-soft),transparent 55%),var(--c-surface);border-color:rgba(238,139,116,.35)}
+.rs-vhead{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);flex-wrap:wrap}
+.rs-cond{font-size:var(--fs-xs);font-weight:700;color:var(--c-text-2)}
+.rs-tier{font-size:var(--fs-xs);font-weight:800;padding:3px 10px;border-radius:var(--r-full);border:1px solid var(--c-line-strong);color:var(--c-text);background:var(--c-sunk)}
+.rs-tier.gold{color:var(--c-gold-ink);background:var(--c-gold);border-color:var(--c-gold)}
+.rs-tier.rainbow{color:var(--c-gold-ink);border-color:transparent;background:linear-gradient(90deg,var(--rb1),var(--rb2),var(--rb3),var(--rb4),var(--rb5))}
+.rs-vbody{display:flex;align-items:center;gap:var(--sp-4)}
+/* the emblem is a ring: nudge it up 2px so it reads centred against the cap-height of the text */
+.result .rank .letter.emb{width:96px;height:96px;flex:none;transform:translateY(-2px)}
+.result .rank .letter.emb svg{width:96px;height:96px}
+.rs-vtext{display:flex;flex-direction:column;gap:var(--sp-1);min-width:0}
+.rs-cap{font-size:var(--fs-xs);color:var(--c-text-2);letter-spacing:.06em}
+.result .rs-vtext h2{margin:0;font-size:var(--fs-xl);line-height:var(--lh-tight)}
+.result .rs-verdict.r-C h2{color:var(--c-bad)}
+.rs-line{font-size:var(--fs-sm);line-height:var(--lh-body);color:var(--c-text-2)}
+.rs-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin:0;padding-top:var(--sp-4);border-top:1px solid var(--c-line)}
+.rs-stats>div{display:flex;flex-direction:column;gap:2px;padding:0 var(--sp-3);min-width:0}
+.rs-stats>div:first-child{padding-left:0}
+.rs-stats>div+div{border-left:1px solid var(--c-line)}
+.rs-stats dt{font-size:var(--fs-xs);color:var(--c-text-2)}
+.rs-stats dd{margin:0;font-size:var(--fs-lg);font-weight:800;font-variant-numeric:tabular-nums;font-family:'Shippori Mincho B1',serif}
+.rs-meta{font-size:var(--fs-xs);line-height:var(--lh-body);color:var(--c-text-2)}
+.result .confetti i{width:5px;height:5px;border-radius:50%}
+
+/* ---------- review: what to fix comes first, in the signal color ---------- */
+.rs-review{display:flex;flex-direction:column;gap:var(--sp-4)}
+.result .fb-group{display:flex;flex-direction:column;gap:var(--sp-2)}
+.result .items{display:flex;flex-direction:column;gap:var(--sp-2)}
+.result details.item{padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);border:1px solid var(--c-line);background:var(--c-surface)}
+.result details.item summary{gap:var(--sp-3);min-height:28px}
+.result details.item summary h3{font-size:var(--fs-base);line-height:1.4}
+.result details.item .body{margin:var(--sp-2) 0 0 40px;font-size:var(--fs-sm);line-height:var(--lh-body);color:var(--c-text-2)}
+.result details.item .body cite{display:block;margin-top:var(--sp-1);font-size:var(--fs-xs);font-style:normal;color:var(--c-text-2);opacity:.8}
+.result .item .ic{width:28px;height:28px}
+.result .fb-group.bad details.item{border-color:rgba(238,139,116,.4);background:linear-gradient(90deg,var(--c-bad-soft),transparent 60%),var(--c-surface)}
+.result .item.bad .ic{background:var(--c-bad-soft);color:var(--c-bad)}
+.result .item.good .ic{background:var(--c-good-soft);color:var(--c-good)}
+.result .item.info .ic{background:var(--c-sunk);color:var(--c-text-2)}
+.result .memo,.result .collection{padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);border:1px solid var(--c-line);background:var(--c-surface)}
+.result .memo summary,.result .collection summary{min-height:28px;align-items:center;font-size:var(--fs-base)}
+.result .memo .items{margin-top:var(--sp-3)}
+.result .memo details.item{background:var(--c-sunk)}
+
+/* ---------- actions ---------- */
+.result .rs-actions{display:flex;gap:var(--sp-2)}
+.result .rs-actions .btn{min-height:56px}
+.result .rs-actions .btn-again{flex:0 0 auto;width:auto;padding:0 var(--sp-4);font-size:var(--fs-base)}
+.result .rs-actions .btn-go{flex:1;font-size:var(--fs-lg)}
+
+/* ---------- progress ---------- */
+.result .rs-progress{display:flex;flex-direction:column;gap:var(--sp-3);padding:var(--sp-4);border-radius:var(--r-lg);border:1px solid var(--c-line);background:var(--c-surface)}
+.result .progtop{display:flex;justify-content:space-between;align-items:baseline;gap:var(--sp-2)}
+.result .progtop b{font-size:var(--fs-md)}
+.result .progtop span{font-size:var(--fs-sm);font-weight:800;color:var(--c-gold)}
+.result .xpbar{height:8px;border-radius:var(--r-full);background:var(--c-sunk)}
+.result .xpbar i{border-radius:var(--r-full);background:var(--c-gold)}
+.result .progsub{display:flex;justify-content:space-between;font-size:var(--fs-xs);color:var(--c-text-2)}
+.result .lvup{margin:0;padding:var(--sp-3);border-radius:var(--r-md);background:var(--c-gold-soft);color:var(--c-gold);font-size:var(--fs-base);font-weight:800;text-align:left;line-height:1.5}
+.result .newbadges{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:var(--sp-2)}
+.result .nb{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-3);border-radius:var(--r-md);background:var(--c-sunk);border:1px solid var(--c-line)}
+.result .nb b{display:block;font-size:var(--fs-sm)}
+.result .nb div>span{font-size:var(--fs-xs);color:var(--c-text-2)}
+.result .medal{width:36px;height:36px;border-radius:50%}
+.result .medal.dexpic{background:var(--c-surface-2);color:var(--c-text)}
+.result .goal{display:flex;flex-direction:column;gap:var(--sp-2);padding:var(--sp-3) 0 0;border-top:1px solid var(--c-line);background:none;border-radius:0}
+.result .goal .gtop{font-size:var(--fs-sm)}
+.result .goal .gbar{height:6px;border-radius:var(--r-full);background:var(--c-sunk)}
+.result .goal .gbar i{background:var(--c-gold);border-radius:var(--r-full)}
+.result .goal .ghint{font-size:var(--fs-xs)}
+.result .badgelist{grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--sp-3)}
+
+/* ---------- small screens: buttons pinned ---------- */
+@media (max-width:959px){
+  .result .rs-actions{position:sticky;bottom:0;z-index:6;margin-inline:calc(var(--sp-4) * -1);padding:var(--sp-3) var(--sp-4) calc(var(--sp-2) + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to top,var(--bg) 78%,rgba(12,16,15,0))}
+}
+@media (min-width:600px) and (max-width:959px){
+  .rs-progress{grid-column:1/8}
+  .result .collection{grid-column:8/13}
+}
+
+/* ---------- wide ---------- */
+@media (min-width:960px){
+  .panel.result{column-gap:var(--sp-5);row-gap:0}
+  .rs-main{display:flex;flex-direction:column;gap:var(--sp-5);grid-column:1/8}
+  .rs-side{display:flex;flex-direction:column;gap:var(--sp-4);grid-column:8/13;position:sticky;top:var(--sp-4)}
+  .result .rs-actions{position:static;background:none;margin:0;padding:0}
+  .rs-main>*,.rs-side>*{order:0}
+}
+@media (max-width:380px){.result .badgelist{grid-template-columns:1fr}.rs-stats>div{padding:0 var(--sp-2)}}
+
+/* =====================================================================
+   下山報告: the verdict on the same paper form as the 入山届
+   ===================================================================== */
+.result .rs-verdict.report{padding:0;gap:0;background:var(--c-paper)!important}
+.report{--accent:var(--c-stamp);--muted:#6B7280;--warn:var(--c-stamp)}
+.report .permit-band .rs-tier{background:var(--c-paper);color:var(--c-ink);border-color:transparent}
+.report .permit-band .rs-tier.gold{background:var(--c-gold);color:var(--c-gold-ink)}
+.report .rs-vhead,.report .rs-vbody,.report .missions,.report .rs-stats,.report .rs-meta{margin-inline:var(--sp-5)}
+.report .rs-vhead{margin-top:var(--sp-4)}
+.report .rs-cond{color:var(--c-ink-2)}
+.report .rs-vbody{margin-top:var(--sp-3)}
+.report .rs-cap{color:var(--c-ink-2)}
+.result .report .rs-vtext h2{color:var(--c-ink)}
+.result .report.r-C .rs-vtext h2{color:var(--c-stamp)}
+.report .rs-line{color:var(--c-ink-2)}
+/* the rank is a red seal pressed on the report */
+.result .report .rank-ring{transform:rotate(-8deg) translateY(-2px)}
+
+/* three goals, stamped one by one */
+.missions{list-style:none;padding:var(--sp-3) 0;margin-top:var(--sp-4);margin-bottom:0;display:flex;flex-direction:column;gap:var(--sp-2);
+  border-top:1.5px dashed var(--c-paper-line);border-bottom:1.5px dashed var(--c-paper-line)}
+.missions li{display:flex;align-items:center;gap:var(--sp-3);font-size:var(--fs-base);font-weight:700;color:var(--c-ink);
+  animation:msIn .35s cubic-bezier(.3,1.5,.5,1) both}
+.missions li.ng{color:var(--c-ink-2)}
+.ms-mark{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font:800 14px/1 'Shippori Mincho B1',serif;
+  border:2px solid currentColor;transform:rotate(-10deg)}
+.missions li.ok .ms-mark{color:var(--c-stamp);background:rgba(200,55,45,.08)}
+.missions li.ng .ms-mark{color:#8A90A0;border-style:dashed}
+.missions li.ng .ms-label{text-decoration:line-through;text-decoration-color:rgba(27,36,64,.35)}
+.missions .ms-all{justify-content:center;margin-top:var(--sp-1);padding:var(--sp-2);border-radius:var(--r-sm);background:var(--c-ink);color:var(--c-gold);
+  font-family:'Shippori Mincho B1',serif;font-weight:800;letter-spacing:.2em;animation:msAll .5s cubic-bezier(.3,1.6,.5,1) both}
+@keyframes msIn{from{opacity:0;transform:scale(1.25)}to{opacity:1;transform:none}}
+@keyframes msAll{from{opacity:0;transform:scale(.8)}to{opacity:1;transform:none}}
+
+.report .rs-stats{margin-top:var(--sp-4);border-top:0;padding-top:0}
+.report .rs-stats>div+div{border-left-color:var(--c-paper-line)}
+.report .rs-stats dt{color:var(--c-ink-2)}
+.report .rs-stats dd{color:var(--c-ink)}
+.report .rs-meta{margin-top:var(--sp-3);margin-bottom:var(--sp-5);color:var(--c-ink-2)}
+.report .newrec{background:var(--c-stamp);color:#fff}
+
+/* actions: the same yellow sign plate as the start button */
+.result .rs-actions .btn-go{min-height:60px;font-size:var(--fs-lg)}
+.result .rs-actions .btn-again{border-radius:var(--r-md)}
+@media (prefers-reduced-motion:reduce){.missions li,.missions .ms-all{animation:none}}

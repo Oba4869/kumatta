@@ -1,0 +1,148 @@
+/* =====================================================================
+   Start screen
+   - 12-column grid shared by both rows (7 | 5 on wide screens)
+   - reads top to bottom: headline on the scene → 入山届 (today's mountain, what you carry) → start
+   - the player's own choices sit on a paper form (入山届); system controls stay plain buttons
+   ===================================================================== */
+
+/* ---------- header (shared) ---------- */
+.app .iconbtn.snd{display:inline-flex;align-items:center;gap:6px;padding:0 12px 0 10px}
+.iconbtn.snd svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.iconbtn.snd svg path:first-child{fill:currentColor;stroke-width:1.4}
+.iconbtn.snd .snd-state{font-size:var(--fs-xs);font-weight:700;min-width:2.2em;text-align:left}
+.app .iconbtn.snd.on{color:var(--c-gold);border-color:var(--c-line-strong);background:var(--c-gold-soft)}
+.app .iconbtn.snd:not(.on){color:var(--c-text-2);border-style:dashed}
+.start summary:focus-visible,.start .tool:focus-visible,.start .player:focus-visible,.start .btn-go:focus-visible{outline:3px solid var(--c-gold);outline-offset:3px}
+
+/* ---------- grid ---------- */
+.panel.start{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));column-gap:var(--sp-4);row-gap:var(--sp-5);align-items:start}
+.start>*{grid-column:1/-1;min-width:0}
+
+/* ---------- text ---------- */
+.start p,.start .cdesc,.start .tool .te,.start .howto li span,.start .mv-text b{text-wrap:pretty;word-break:auto-phrase}
+.start h1,.start .permit-h{text-wrap:balance}
+
+/* ---------- hero: headline on the dark side of the scene ---------- */
+.st-hero{position:relative;border-radius:var(--r-lg);overflow:hidden;box-shadow:0 0 0 1px var(--c-line),var(--shadow-1);aspect-ratio:16/10;background:#05070f}
+.st-hero .hero-scene{display:block;width:100%;height:100%;background:#05070f}
+.st-hero::after{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(70% 60% at 0% 0%,rgba(2,4,10,.55),rgba(2,4,10,0) 75%)}
+.st-hero-text{position:absolute;z-index:1;left:0;top:0;right:0;padding:var(--sp-4) var(--sp-5);display:flex;flex-direction:column;gap:var(--sp-2)}
+.st-hero h1{font-size:clamp(22px,6.4vw,26px);line-height:var(--lh-tight);letter-spacing:.02em;text-shadow:0 2px 12px rgba(0,0,0,.8)}
+.st-hero .lead{font-size:var(--fs-sm);line-height:1.7;color:rgba(241,231,207,.88);max-width:28em;text-shadow:0 1px 8px rgba(0,0,0,.9)}
+@media (max-width:599px){
+  .st-hero{overflow:visible;aspect-ratio:auto;box-shadow:none;background:none}
+  .st-hero .hero-scene{aspect-ratio:16/10;height:auto;border-radius:var(--r-lg);box-shadow:0 0 0 1px var(--c-line),var(--shadow-1)}
+  .st-hero::after{inset:0 0 auto 0;aspect-ratio:16/10;border-radius:var(--r-lg)}
+  .st-hero-text{position:static;padding:0}
+  .st-hero h1{position:absolute;z-index:2;left:var(--sp-4);top:14px;right:var(--sp-4);font-size:clamp(18px,5.4vw,22px);max-width:64%}
+  .st-hero .lead{margin-top:var(--sp-3);color:var(--c-text-2);text-shadow:none}
+}
+
+/* ---------- 入山届 (paper form) ---------- */
+.permit{display:flex;flex-direction:column}
+.permit-row{display:flex;flex-direction:column;gap:var(--sp-3);padding:var(--sp-4)}
+.permit-row+.permit-row{border-top:1.5px dashed var(--c-paper-line)}
+.permit-h{margin:0;font-size:var(--fs-sm);font-weight:800;line-height:var(--lh-tight);color:var(--c-ink-2);letter-spacing:.08em}
+.st-hrow{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3)}
+.st-count{font-size:var(--fs-xs);font-weight:800;color:var(--c-ink-2);padding:3px 10px;border-radius:var(--r-full);background:var(--c-paper-2);white-space:nowrap}
+.st-count.done{color:var(--c-gold-ink);background:var(--c-gold)}
+.st-count.warn{color:#fff;background:var(--c-stamp)}
+
+/* today's mountain */
+.start .permit .cond{padding:0;gap:var(--sp-4);align-items:flex-start;background:none!important;border:0!important;box-shadow:none!important;color:var(--c-ink)}
+.start .permit .cicon{width:48px;height:48px;border-radius:var(--r-sm);background:var(--c-ink);color:var(--c-gold);flex:none}
+.start .permit .ctext{display:flex;flex-direction:column;gap:2px;min-width:0}
+.start .permit .cond b{font-family:'Shippori Mincho B1',serif;font-size:var(--fs-lg);font-weight:800;line-height:var(--lh-tight);color:var(--c-ink)}
+.start .permit .cdiff{font-size:var(--fs-xs);font-weight:800;color:var(--c-stamp);letter-spacing:.06em}
+.start .permit .cdesc{margin-top:var(--sp-1);font-size:var(--fs-sm);line-height:var(--lh-body);color:var(--c-ink-2)}
+
+/* what you carry: checklist rows (equal height, readable descriptions) */
+.start .permit .tools{display:grid;grid-template-columns:1fr;gap:var(--sp-2)}
+.start .permit .tool{display:grid;grid-template-columns:40px minmax(0,1fr) 28px;align-items:center;gap:var(--sp-3);min-height:60px;width:100%;
+  padding:var(--sp-2) var(--sp-3);border-radius:var(--r-sm);border:1.5px solid var(--c-paper-line)!important;background:rgba(255,255,255,.35)!important;
+  color:var(--c-ink);text-align:left;box-shadow:none!important;cursor:pointer;transition:background .15s,border-color .15s}
+.start .permit .tool:hover{border-color:rgba(27,36,64,.4)!important}
+.start .permit .tool .ti{width:40px;height:40px;border-radius:var(--r-sm);display:grid;place-items:center;background:var(--c-ink);color:var(--c-paper)}
+.start .permit .tool .tt{display:flex;flex-direction:column;gap:1px;min-width:0}
+.start .permit .tool .tn{font-size:var(--fs-base);font-weight:800;line-height:1.35;color:var(--c-ink)}
+.start .permit .tool .te{font-size:var(--fs-sm);line-height:1.45;color:var(--c-ink-2)}
+.start .permit .tool .chk{position:static;display:grid;place-items:center;width:28px;height:28px;border-radius:6px;border:2px solid rgba(27,36,64,.45);background:transparent;color:transparent}
+.start .permit .tool[aria-pressed="true"]{background:rgba(244,179,35,.32)!important;border-color:var(--c-ink)!important}
+.start .permit .tool[aria-pressed="true"] .ti{background:var(--c-gold);color:var(--c-gold-ink)}
+.start .permit .tool[aria-pressed="true"] .chk{display:grid;background:var(--c-ink);border-color:var(--c-ink);color:var(--c-gold);animation:chkPop .28s cubic-bezier(.3,1.6,.5,1)}
+@keyframes chkPop{from{transform:scale(.5)}to{transform:scale(1)}}
+
+/* ---------- start button ---------- */
+.start .st-go{display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-2)}
+.start .btn-go{width:100%;min-height:64px;font-size:var(--fs-lg)}
+.go-hint{margin:0;font-size:var(--fs-sm);line-height:1.5;color:var(--c-text-2);text-align:center;min-height:1.5em}
+
+/* ---------- how to play, in three moves ---------- */
+.st-moves{list-style:none;margin:0;padding:var(--sp-4) var(--sp-3);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--sp-2);
+  border-radius:var(--r-lg);background:var(--c-surface);border:1px solid var(--c-line)}
+.st-moves li{display:flex;flex-direction:column;align-items:center;text-align:center;gap:var(--sp-2);min-width:0}
+.mv-ic{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:var(--c-gold-soft);color:var(--c-gold);flex:none}
+.mv-ic svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.mv-ic i{position:absolute;right:-4px;top:-4px;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font:800 11px/1 'Shippori Mincho B1',serif;font-style:normal;color:var(--c-gold-ink);background:var(--c-gold)}
+.mv-text{display:flex;flex-direction:column;align-items:center;gap:var(--sp-1)}
+.mv-text b{font-size:var(--fs-sm);line-height:1.4}
+.mv-text kbd{font:700 var(--fs-xs)/1.5 var(--font);color:var(--c-text);border:1px solid var(--c-line-strong);border-radius:6px;padding:0 6px;white-space:nowrap}
+.mv-text kbd.sp{display:none}
+@media (pointer:coarse){.mv-text kbd.pc{display:none}.mv-text kbd.sp{display:inline}}
+
+/* ---------- record + full rules (dark panels) ---------- */
+.start .player,.start .howto-box{border:1px solid var(--c-line);background:var(--c-surface);box-shadow:none;border-radius:var(--r-lg)}
+.start .player{padding:var(--sp-4)}
+.start .howto-box{padding:var(--sp-3) var(--sp-4)}
+.start .howto-box .howto li{background:var(--c-sunk);border-radius:var(--r-md);padding:var(--sp-3)}
+.st-howto .howto li span{line-height:1.7}
+
+/* ---------- entrance: the scene first, then the form slides up (once) ---------- */
+.start .st-hero{animation:stIn .6s ease-out both}
+.start .permit{animation:stUp .55s .15s cubic-bezier(.2,.8,.3,1) both}
+@media (min-width:960px){.start .st-go{animation:stUp .55s .28s cubic-bezier(.2,.8,.3,1) both}}
+@keyframes stIn{from{opacity:0}to{opacity:1}}
+@keyframes stUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+
+/* ---------- small screens (<960): one column, the start button pinned to the bottom ---------- */
+@media (max-width:959px){
+  .start .st-go{order:10;position:sticky;bottom:0;z-index:6;margin-inline:calc(var(--sp-4) * -1);padding:var(--sp-3) var(--sp-4) calc(10px + env(safe-area-inset-bottom,0px));
+    background:linear-gradient(to top,var(--bg) 78%,rgba(7,11,22,0))}
+}
+@media (min-width:600px) and (max-width:959px){
+  .st-hero{aspect-ratio:2/1}
+  .st-hero h1{font-size:30px}
+  .st-hero-text{padding:var(--sp-5)}
+  .start .permit .tools{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .st-record{grid-column:1/7}
+  .st-howto{grid-column:7/13}
+}
+@media (orientation:landscape) and (max-height:520px) and (max-width:959px){
+  .st-hero{aspect-ratio:auto;height:58vh;min-height:200px}
+  .st-hero h1{font-size:24px}
+}
+
+/* ---------- wide (>=960): 7 | 5 on both rows ---------- */
+@media (min-width:700px){.app{max-width:1160px}}
+@media (min-width:960px){
+  body{padding-block:12px 24px}
+  .app{gap:var(--sp-4)}
+  .panel.start{column-gap:var(--sp-5);row-gap:var(--sp-4);grid-template-rows:auto auto 1fr auto}
+  .st-hero{grid-column:1/8;grid-row:1/4;align-self:stretch;aspect-ratio:auto;min-height:340px}
+  .st-hero-text{padding:var(--sp-5) var(--sp-6) var(--sp-6);gap:var(--sp-3)}
+  .st-hero h1{font-size:clamp(30px,2.7vw,38px)}
+  .permit{grid-column:8/13;grid-row:1}
+  .st-go{grid-column:8/13;grid-row:2}
+  .st-moves{grid-column:8/13;grid-row:3;align-self:start}
+  .st-record{grid-column:1/8;grid-row:4;margin-top:var(--sp-2)}
+  .st-howto{grid-column:8/13;grid-row:4;margin-top:var(--sp-2)}
+  .start .st-go{position:static;background:none}
+}
+
+/* ---------- scene animation (eyes are animated inside the SVG) ---------- */
+.hero-scene .hs-breath{opacity:0;transform-box:fill-box;transform-origin:center;animation:hsBreathe 3.6s ease-out infinite}
+.hero-scene .hs-breath.b2{animation-delay:.25s}
+@keyframes hsBreathe{0%,40%{opacity:0;transform:translate(0,0) scale(.5)}52%{opacity:.3}100%{opacity:0;transform:translate(-46px,-6px) scale(2.2,1.6)}}
+.hero-scene .hs-fog{animation:hsFog 16s ease-in-out infinite alternate}
+@keyframes hsFog{from{transform:translateX(-60px)}to{transform:translateX(60px)}}
+@media (prefers-reduced-motion:reduce){.hero-scene *,.start .st-hero,.start .permit,.start .st-go,.start .permit .tool .chk{animation:none!important}}

@@ -1,0 +1,69 @@
+/* =====================================================================
+   Design tokens for the menus (start / result).
+   Every space, size, radius and color on those screens comes from here,
+   so nothing is "almost" the same value.
+   ===================================================================== */
+:root{
+  /* spacing: 4-step scale */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:24px; --sp-6:32px; --sp-7:48px;
+  /* type scale */
+  --fs-xs:12px; --fs-sm:13px; --fs-base:15px; --fs-md:17px; --fs-lg:20px; --fs-xl:26px;
+  --lh-tight:1.3; --lh-body:1.65;
+  /* radius: panel > control > chip */
+  --r-lg:16px; --r-md:12px; --r-sm:8px; --r-full:999px;
+  /* color: night navy + warning-sign yellow (from the scene) + paper for the forms */
+  --c-gold:#F4B323; --c-gold-ink:#1A1405; --c-gold-soft:rgba(244,179,35,.14);
+  --c-line:rgba(244,179,35,.2); --c-line-strong:rgba(244,179,35,.55);
+  --c-surface:#0F1628; --c-surface-2:#16203A; --c-sunk:rgba(0,0,0,.25);
+  --c-paper:#EEE6D3; --c-paper-2:#E3D8C1; --c-ink:#1B2440; --c-ink-2:#4F5870; --c-paper-line:rgba(27,36,64,.16);
+  --c-stamp:#C8372D;
+  --hazard:repeating-linear-gradient(-45deg,#F4B323 0 9px,#1A1405 9px 18px);
+  /* chamfered corners, echoing the warning sign */
+  --cut:10px;
+  --chamfer:polygon(var(--cut) 0,100% 0,100% calc(100% - var(--cut)),calc(100% - var(--cut)) 100%,0 100%,0 var(--cut));
+  --c-text:#F1E7CF; --c-text-2:#B4AA90;
+  --c-bad:#EE8B74; --c-bad-soft:rgba(238,139,116,.12);
+  --c-good:#9FD0A3; --c-good-soft:rgba(159,208,163,.12);
+  --shadow-1:0 10px 28px rgba(0,0,0,.32);
+}
+
+/* shared pieces */
+.app .iconbtn{border-color:var(--c-line);border-radius:var(--r-md)}
+.app .btn{border-radius:var(--r-md)}
+.app .btn-plain{border:1px solid var(--c-line-strong);background:transparent;color:var(--c-text)}
+.app .btn-plain:hover{background:var(--c-gold-soft)}
+.app .btn:focus-visible,.app summary:focus-visible,.app .iconbtn:focus-visible{outline:3px solid var(--c-gold);outline-offset:3px}
+
+/* the in-game heartbeat icon is replaced by the screen pulse + sound */
+.g3-heart{display:none!important}
+
+/* the menus share the night-navy of the scene */
+html:root:not(#_):not(#__){--bg:#070B16;--surface:#0F1628;--accent:#F4B323;--accent-soft:rgba(244,179,35,.14);--line:#22304F}
+body:not(.playing){background:radial-gradient(120% 60% at 50% -10%,#121C36 0%,rgba(18,28,54,0) 70%) fixed,var(--bg)}
+.app .brand{color:var(--c-gold)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+
+/* main call to action: yellow sign plate with cut corners and a light that sweeps across */
+.app .btn-go{position:relative;isolation:isolate;background:none!important;box-shadow:none!important;color:var(--c-gold-ink);border-radius:0;
+  font-family:'Shippori Mincho B1',serif;font-weight:800;letter-spacing:.2em;overflow:visible}
+.app .btn-go::before{content:'';position:absolute;inset:0;z-index:-1;clip-path:var(--chamfer);
+  background:linear-gradient(115deg,rgba(255,255,255,0) 40%,rgba(255,255,255,.55) 50%,rgba(255,255,255,0) 60%) -150% 0/250% 100% no-repeat,var(--c-gold)}
+.app .btn-go::after{content:'';position:absolute;inset:4px;z-index:-1;clip-path:var(--chamfer);border:0;
+  box-shadow:inset 0 0 0 1.5px rgba(26,20,5,.55)}
+.app .btn-go:not(:disabled)::before{animation:goShine 3.2s ease-in-out 1s infinite}
+@keyframes goShine{0%,55%{background-position:-150% 0,0 0}100%{background-position:150% 0,0 0}}
+.app .btn-go:not(:disabled):hover{transform:translateY(-1px)}
+.app .btn-go:not(:disabled):active{transform:translateY(1px)}
+.app .btn-go:disabled{color:var(--c-text-2);cursor:not-allowed}
+.app .btn-go:disabled::before{background:var(--c-surface-2)}
+.app .btn-go:disabled::after{box-shadow:inset 0 0 0 1px var(--c-line)}
+@media (prefers-reduced-motion:reduce){.app .btn-go::before{animation:none!important}}
+
+/* paper form used for 入山届 (start) and 下山報告 (result) */
+.permit,.app .report{position:relative;background:var(--c-paper)!important;color:var(--c-ink);border:0!important;border-radius:var(--r-md)!important;
+  box-shadow:0 1px 0 rgba(255,255,255,.4) inset,0 18px 40px rgba(0,0,0,.45)!important;overflow:hidden}
+.permit-band{display:flex;align-items:center;justify-content:space-between;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4) var(--sp-3) calc(var(--sp-4) + 22px);
+  background:var(--c-ink);color:var(--c-paper);position:relative}
+.permit-band::before{content:'';position:absolute;left:0;top:0;bottom:0;width:14px;background:var(--hazard)}
+.permit-title{font-family:'Shippori Mincho B1',serif;font-weight:800;font-size:var(--fs-md);letter-spacing:.3em}
+.permit-date{font-size:var(--fs-xs);font-weight:700;opacity:.75}
