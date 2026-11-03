@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router';
+import ProfileMenu from './components/ProfileMenu';
 import DexScreen from './components/DexScreen';
 import PlayScreen from './components/PlayScreen';
 import ResultScreen from './components/ResultScreen';
@@ -30,20 +31,19 @@ function Layout() {
     return (
       <>
         <Outlet />
-        <button className={'scr-sound' + (sound ? ' on' : '')} type="button" aria-pressed={sound} aria-label="効果音" title={sound ? '効果音：オン（押すとオフ）' : '効果音：オフ（押すとオン）'} onClick={toggleSound}>
-          <SoundIcon on={sound} />
-          <span aria-hidden="true">{sound ? 'オン' : 'オフ'}</span>
-        </button>
+        <ProfileMenu />
       </>
     );
   }
+
+  if (pathname !== '/play') return <><Outlet /><ProfileMenu /></>;
 
   return (
     <div className="app">
       <div className="top">
         <span className="brand">くまった</span>
         <div className="top-actions">
-          {pathname !== '/dex' && <button className="iconbtn" type="button" onClick={() => navigate('/dex')}>図鑑</button>}
+          <button className="iconbtn" type="button" onClick={() => navigate('/dex')}>図鑑</button>
           <button className={'iconbtn snd' + (sound ? ' on' : '')} type="button" aria-pressed={sound} aria-label="効果音" title={sound ? '効果音：オン（押すとオフ）' : '効果音：オフ（押すとオン）'} onClick={toggleSound}>
             <SoundIcon on={sound} />
             <span className="snd-state" aria-hidden="true">{sound ? 'オン' : 'オフ'}</span>
@@ -72,13 +72,16 @@ function PlayRoute() {
   return <PlayScreen key={play.key} setup={play.engine} onDone={finishRun} onQuit={() => navigate('/tools', { replace: true })} />;
 }
 
-function ResultRoute() {
+function ResultRoute({ review = false }: { review?: boolean }) {
   const { last, play, startRun } = useGame();
   const navigate = useNavigate();
   if (!last) return <Navigate to="/" replace />;
   return (
     <ResultScreen
       key={play?.key}
+      review={review}
+      onReview={() => navigate('/review')}
+      onResult={() => navigate('/result')}
       outcome={last.outcome}
       result={last.result}
       onAgain={startRun}
@@ -91,7 +94,7 @@ function ResultRoute() {
 function DexRoute() {
   const { profile } = useGame();
   const navigate = useNavigate();
-  return <DexScreen profile={profile} onBack={() => navigate(-1)} />;
+  return <main className="collection-screen"><DexScreen profile={profile} onBack={() => navigate(-1)} /></main>;
 }
 
 export default function App() {
@@ -104,6 +107,7 @@ export default function App() {
           <Route path="tools" element={<ToolsRoute />} />
           <Route path="play" element={<PlayRoute />} />
           <Route path="result" element={<ResultRoute />} />
+          <Route path="review" element={<ResultRoute review />} />
           <Route path="dex" element={<DexRoute />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>

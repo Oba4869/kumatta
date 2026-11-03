@@ -1,10 +1,15 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
-import { diffStars } from '../data/conditions';
 import { MAX_TOOLS, TOOLS, type ToolId } from '../data/tools';
 import { useGame } from '../GameContext';
-import { CheckIcon, TOOL_ICON } from './Icons';
-import StageArt from './StageArt';
+import { CheckIcon } from './Icons';
+import { RadioArt, HelmetArt } from './EquipmentArt';
+import campsite from '../assets/equipment/campsite-background.png';
+import backpack from '../assets/equipment/backpack.png';
+import bearBell from '../assets/equipment/bear-bell.png';
+import bearSpray from '../assets/equipment/bear-spray.png';
+
+const TOOL_IMAGE: Partial<Record<ToolId, string>> = { pack: backpack, bell: bearBell, spray: bearSpray };
 
 export default function ToolSelectScreen() {
   const navigate = useNavigate();
@@ -14,7 +19,7 @@ export default function ToolSelectScreen() {
   const toolRefs = useRef<Partial<Record<ToolId, HTMLButtonElement | null>>>({});
 
   if (!setup) return null; // guarded by the route wrapper
-  const { base, wx, offer } = setup;
+  const { offer } = setup;
 
   const toggle = (k: ToolId) => {
     setInfo(k);
@@ -30,54 +35,43 @@ export default function ToolSelectScreen() {
   };
 
   const ready = picked.length >= MAX_TOOLS;
-  const sub = full && ready ? '持てるのは' + MAX_TOOLS + 'つまで。' : MAX_TOOLS + 'つまで選択。';
+
 
   return (
-    <main className="scr scr-tools">
-      <StageArt id={base.id} className="scr-bg blurred" />
-      <div className="scr-shade" />
-
-      <header className="scr-head">
-        <button className="scr-back" type="button" aria-label="山の選択へ戻る" onClick={() => navigate('/stages')}>
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" /></svg>
-        </button>
-        <h1 id="toolsTitle">持ち物を選ぶ</h1>
-        <span className="scr-chip">{base.short + (wx ? '・' + wx.name : '')} 難易度 {diffStars(base.diff)}</span>
-      </header>
-
-      <div className="tools-body">
-        <p className={'scr-sub' + (full ? ' warn' : '')} aria-live="polite">{sub}</p>
-
-        <div className="mtools" role="group" aria-labelledby="toolsTitle">
-          {offer.map((k) => {
+    <main className="scr scr-tools equipment-screen">
+      <div className="equipment-background" style={{ backgroundImage: `url(${campsite})` }} aria-hidden="true" />
+      <div className="equipment-layout">
+        <header className="equipment-heading">
+          <button className="equipment-back" type="button" aria-label="山の選択へ戻る" onClick={() => navigate('/stages')}>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m15 5-7 7 7 7" /></svg>
+          </button>
+          <div><h1 id="toolsTitle">持ち物を選ぶ</h1><span>EQUIPMENT</span></div>
+        </header>
+        <p className={'equipment-instruction' + (full ? ' warn' : '')} aria-live="polite">
+          {full && ready ? <>持てるのは <strong>{MAX_TOOLS}つまで</strong>。</> : <>役立つ道具を <strong>{MAX_TOOLS}つまで</strong>選んで、出発しよう。</>}
+        </p>
+        <div className="equipment-cards" role="group" aria-labelledby="toolsTitle">
+          {offer.map(k => {
             const on = picked.includes(k);
-            return (
-              <button
-                key={k}
-                ref={(el) => { toolRefs.current[k] = el; }}
-                type="button"
-                className={'mtool' + (on ? ' on' : '') + (!on && ready ? ' dim' : '')}
-                aria-pressed={on}
-                aria-label={TOOLS[k].name + '。' + TOOLS[k].desc}
-                onClick={() => toggle(k)}
-              >
-                <span className="mchk" aria-hidden="true"><CheckIcon /></span>
-                <span className="mti">{TOOL_ICON[k]}</span>
-                <span className="mtn">{TOOLS[k].name}</span>
-              </button>
-            );
+            return <button key={k} ref={el => { toolRefs.current[k] = el; }} type="button"
+              className={'equipment-card' + (on ? ' selected' : '')}
+              aria-pressed={on} aria-label={TOOLS[k].name + '。' + TOOLS[k].desc} onClick={() => toggle(k)}>
+              <span className="equipment-check" aria-hidden="true"><CheckIcon /></span>
+              <span className={'equipment-item equipment-item-' + k}>
+                {TOOL_IMAGE[k] ? <img src={TOOL_IMAGE[k]} alt="" draggable={false} /> : k === 'radio' ? <RadioArt /> : <HelmetArt />}
+              </span>
+              <span className="equipment-name">{TOOLS[k].name}</span>
+            </button>;
           })}
         </div>
-
-        <p className="tool-desc" aria-live="polite">{info ? TOOLS[info].eff + '。' + TOOLS[info].desc : ' '}</p>
-      </div>
-
-      <footer className="scr-foot">
-        <button className="mbtn go" type="button" onClick={startRun} disabled={!ready}>
+        <p className="sr-only" aria-live="polite">{info ? TOOLS[info].eff + '。' + TOOLS[info].desc : ''}</p>
+        <div className={'equipment-start-frame' + (ready ? ' ready' : '')}>
+        <button className={'equipment-start' + (ready ? ' ready' : '')} type="button" onClick={startRun} disabled={!ready}>
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m6 3 16 9L6 21Z" /></svg>
           <span>プレイ開始</span>
-          <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12h15M13 6l6 6-6 6" /></svg>
         </button>
-      </footer>
+        </div>
+      </div>
     </main>
   );
 }

@@ -26,10 +26,10 @@ export default function TitleScreen() {
             <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5zM12 6.5v13" /></svg>
             <span>あそびかた</span>
           </button>
-          <button className="mbtn" type="button" onClick={() => navigate('/dex')}>
-            <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="8" /><path d="M12 8v4l3 2" /></svg>
-            <span>図鑑・きろく</span>
-          </button>
+          <a className="bear-info" href="https://www.env.go.jp/nature/choju/effort/effort12/" target="_blank" rel="noreferrer">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M14 3h7v7M21 3L10 14M10 5H4v16h16v-6" /></svg>
+            クマ情報
+          </a>
         </nav>
       </div>
 

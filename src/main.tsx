@@ -7,6 +7,8 @@ import './ui.css';
 import './start.css';
 import './result.css';
 import './menu.css';
+import './refresh.css';
+import './menu-polish.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
