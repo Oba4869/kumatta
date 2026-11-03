@@ -13,6 +13,15 @@ const shuffle = <T,>(a: T[]) => {
   return b;
 };
 
+/** Builds the setup for a mountain the player picked on the stage-select screen. */
+export const drawStage = (p: Profile, id: Condition['id']): RunSetup => {
+  const base = CONDS.find((c) => c.id === id)!;
+  const nOffer = lvInfo(p.xp).l >= FOURTOOLS_LV ? 4 : 3;
+  const offer = shuffle(TOOL_IDS).slice(0, nOffer);
+  const wx = base.wxs ? base.wxs[Math.floor(Math.random() * base.wxs.length)] : null;
+  return { base, wx, offer };
+};
+
 /**
  * Draws the next mountain: a condition different from the last one, its weather,
  * and the tool cards on offer. Returns the profile with the snow counter advanced.
