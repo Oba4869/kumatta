@@ -24,6 +24,7 @@ import { Audio3D } from './audio3d';
 import { ICONS, makeBear, makeCritter, makeHand, makeHiker, type BearKind, type BearRig, type CritterKind } from './actors';
 import { makePost } from './post';
 import { softDot } from './textures';
+import { getKit, loadKit } from './kit';
 import { buildWorld, GOAL_Z, groundY, HALF_W, pathX, START_Z, type Look, type World } from './world';
 
 export interface EngineSetup {
@@ -255,14 +256,22 @@ export class Game3D {
   }
 
   /* ================= setup ================= */
+  private gone = false;
+  private kitWaited = false;
   start() {
+    /* the forest models load in the background from page start; wait for them the first time */
+    if (!getKit() && !this.kitWaited) {
+      this.kitWaited = true;
+      loadKit().then(() => { if (!this.gone) this.start(); });
+      return;
+    }
     const canvas = this.$<HTMLCanvasElement>('#g3d');
     this.renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: 'high-performance' });
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = this.look === 'fog' ? 0.95 : 1.15;
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
-    this.world = buildWorld(this.scene, { look: this.look, stream: this.setup.cond.id === 'stream', windy: this.windy, lite: this.coarse });
+    this.world = buildWorld(this.scene, { look: this.look, stream: this.setup.cond.id === 'stream', windy: this.windy, lite: this.coarse, kit: getKit() });
     this.scene.add(this.camera);
     this.buildPlayer();
     this.spawnBears();
@@ -289,6 +298,7 @@ export class Game3D {
   }
 
   destroy() {
+    this.gone = true;
     cancelAnimationFrame(this.raf);
     this.ac.abort();
     this.timers.forEach(clearTimeout);

@@ -4,6 +4,7 @@
  */
 import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import type { Kit, KitModel, Role } from './kit';
 import { enhance, shared } from './materials';
 import { barkTexture, fogPuff, groundTextures, signTexture, softDot, trailTextures } from './textures';
 
@@ -18,7 +19,11 @@ export const groundY = (x: number, z: number) => {
 };
 
 export type Look = 'night' | 'dusk' | 'fog' | 'snow';
-export interface WorldOpts { look: Look; stream: boolean; windy: boolean; /** phones: less grass and fewer ferns */ lite?: boolean }
+export interface WorldOpts {
+  look: Look; stream: boolean; windy: boolean;
+  /** phones: less grass and fewer ferns */ lite?: boolean;
+  /** Kenney nature models; when missing, the forest is built from simple shapes */ kit?: Kit | null;
+}
 export interface Collider { x: number; z: number; r: number }
 
 const rnd = (a: number, b: number) => a + Math.random() * (b - a);
@@ -147,6 +152,42 @@ export function buildWorld(scene: THREE.Scene, o: WorldOpts) {
   const nearEnds = (x: number, z: number) => Math.hypot(x - pathX(START_Z), z - START_Z) < 6 || Math.hypot(x - cabin.x, z - cabin.z) < 10;
   const M = new THREE.Matrix4(), Q = new THREE.Quaternion(), S = new THREE.Vector3(), P = new THREE.Vector3(), C = new THREE.Color();
 
+  /* ---------- night-time materials for the Kenney models, one per role ---------- */
+  const kit = o.kit ?? null;
+  const roleMat: Partial<Record<Role, THREE.MeshStandardMaterial>> = {};
+  const mat = (r: Role) => {
+    if (roleMat[r]) return roleMat[r]!;
+    const spec: Record<Role, [number, number, Parameters<typeof enhance>[1]]> = {
+      leaf: [snow ? 0xa4b4ae : 0x1d3a29, 0.9, { rim: [0.05, 0.08, 0.11], rimPower: 3, wind: 1.6 }],
+      bark: [0x3a2e26, 1, { rim: [0.05, 0.06, 0.09] }],
+      wood: [0x6e5a45, 0.95, { rim: [0.05, 0.05, 0.06] }],
+      rock: [snow ? 0x8f979b : 0x5c6058, 0.95, { rim: [0.06, 0.08, 0.11] }],
+      moss: [snow ? 0xb9c4c2 : 0x22402c, 0.9, { rim: [0.05, 0.08, 0.06], wind: 0.6 }],
+      stem: [0xcfc4ae, 0.8, { rim: [0.06, 0.06, 0.06] }],
+      red: [0x9c3027, 0.7, { rim: [0.08, 0.05, 0.05] }],
+      tan: [0xb99c76, 0.8, { rim: [0.07, 0.06, 0.05] }],
+      flower: [0x7d6caa, 0.8, { rim: [0.06, 0.06, 0.1], wind: 1.2 }],
+    };
+    const [color, roughness, eo] = spec[r];
+    return (roleMat[r] = enhance(new THREE.MeshStandardMaterial({ color, roughness, flatShading: true }), eo));
+  };
+  /** one instanced mesh per model; `place` fills in the instance transforms and returns how many it placed */
+  const instance = (m: KitModel, count: number, place: (i: number) => THREE.Matrix4 | null, tint?: () => THREE.Color) => {
+    const mesh = new THREE.InstancedMesh(m.geo.clone(), m.roles.map(mat), count);
+    let n = 0;
+    for (let i = 0; i < count; i++) {
+      const mtx = place(i);
+      if (!mtx) continue;
+      mesh.setMatrixAt(n, mtx);
+      if (tint) mesh.setColorAt(n, tint());
+      n++;
+    }
+    mesh.count = n;
+    mesh.castShadow = mesh.receiveShadow = true;
+    scene.add(mesh);
+    return mesh;
+  };
+
   /* ---------- conifers: three shapes, each one instanced mesh with bark + needles ---------- */
   const bark = barkTexture();
   const barkMat = enhance(new THREE.MeshStandardMaterial({ map: bark, color: 0x8a7a6a, roughness: 1 }), { rim: [0.05, 0.06, 0.09] });
@@ -180,7 +221,12 @@ export function buildWorld(scene: THREE.Scene, o: WorldOpts) {
     trunk.setAttribute('color', new THREE.Float32BufferAttribute(tc, 3));
     return mergeGeometries([trunk.toNonIndexed(), leaves], true);
   };
+  /* the built-in conifers stay as the dense, dark mass of the forest; Kenney's tall pines are mixed in for variety */
+  const KIT_TREES = ['tree_pineTallA_detailed', 'tree_pineTallB_detailed', 'tree_pineTallC_detailed', 'tree_pineTallD_detailed', 'tree_pineDefaultA', 'tree_pineDefaultB']
+    .filter((n) => kit?.[n]);
   const variants = [conifer(5, 1), conifer(6, 0.85), conifer(4, 1.15)];
+  /** variant index: 0-2 built-in, 3+ Kenney (about 40% of the trees when the kit is loaded) */
+  const pickVariant = () => (KIT_TREES.length && Math.random() < 0.4 ? 3 + Math.floor(Math.random() * KIT_TREES.length) : Math.floor(Math.random() * 3));
   const treeSpots: { x: number; z: number; s: number; v: number }[] = [];
   for (let i = 0, t = 0; i < 330 && t < 9000; t++) {
     const z = rnd(-118, 118), edge = Math.random() < 0.38;
@@ -188,10 +234,21 @@ export function buildWorld(scene: THREE.Scene, o: WorldOpts) {
     const s = rnd(0.85, 1.55);
     if (!offTrail(x, z, 3.2 + s * 0.4) || !offStream(x, z) || nearEnds(x, z) || !free(x, z, 1.1 * s)) continue;
     spots.push({ x, z, r: 1.1 * s });
-    treeSpots.push({ x, z, s, v: Math.floor(Math.random() * 3) });
+    treeSpots.push({ x, z, s, v: pickVariant() });
     /* wide enough that your eyes never end up inside the lowest branches */
     if (Math.abs(x) < HALF_W + 1) colliders.push({ x, z, r: 0.85 * s + 0.2 });
     i++;
+  }
+  if (kit && KIT_TREES.length) {
+    KIT_TREES.forEach((name, ki) => {
+      const mine = treeSpots.filter((t) => t.v === 3 + ki), model = kit[name];
+      instance(model, mine.length, (i) => {
+        const t = mine[i];
+        const k = (5.8 * t.s) / model.height;
+        Q.setFromAxisAngle(UP, Math.random() * 6.28);
+        return M.compose(P.set(t.x, groundY(t.x, t.z) - 0.1, t.z), Q, S.set(k, k * rnd(0.9, 1.15), k));
+      }, () => C.setHSL(0.33 + rnd(-0.03, 0.04), 0.2, rnd(0.4, 0.55)).multiplyScalar(1.6));
+    });
   }
   variants.forEach((geo, vi) => {
     const mine = treeSpots.filter((t) => t.v === vi);
@@ -232,14 +289,16 @@ export function buildWorld(scene: THREE.Scene, o: WorldOpts) {
     dead.castShadow = true;
     scene.add(dead);
     const logG = new THREE.CylinderGeometry(0.28, 0.32, 5, 9); logG.rotateZ(Math.PI / 2);
-    const logs = new THREE.InstancedMesh(logG, barkMat, 12);
+    const kitLog = kit?.log_large;
+    const logs = kitLog ? new THREE.InstancedMesh(kitLog.geo.clone(), kitLog.roles.map(mat), 12) : new THREE.InstancedMesh(logG, barkMat, 12);
     for (let i = 0; i < 12; i++) {
       let x = 0, z = 0;
       for (let t = 0; t < 50; t++) { z = rnd(-100, 100); x = pathX(z) + (Math.random() < 0.5 ? -1 : 1) * rnd(3.5, 9); if (free(x, z, 2) && offStream(x, z) && !nearEnds(x, z)) break; }
       spots.push({ x, z, r: 1.6 });
       const a = rnd(0, 6.28);
       for (const s of [-1.6, 0, 1.6]) colliders.push({ x: x + Math.cos(a) * s, z: z - Math.sin(a) * s, r: 0.45 });
-      M.compose(P.set(x, groundY(x, z) + 0.2, z), Q.setFromAxisAngle(UP, a), S.setScalar(1));
+      if (kitLog) M.compose(P.set(x, groundY(x, z) - 0.05, z), Q.setFromAxisAngle(UP, a), S.set(4.6, 2.4, 2.4));
+      else M.compose(P.set(x, groundY(x, z) + 0.2, z), Q.setFromAxisAngle(UP, a), S.setScalar(1));
       logs.setMatrixAt(i, M);
     }
     logs.castShadow = logs.receiveShadow = true;
@@ -247,7 +306,22 @@ export function buildWorld(scene: THREE.Scene, o: WorldOpts) {
   }
 
   /* ---------- rocks ---------- */
-  {
+  if (kit?.rock_largeA) {
+    const big = ['rock_largeA', 'rock_largeB', 'rock_largeC', 'rock_largeD'].filter((n) => kit[n]);
+    const tall = ['rock_tallA', 'rock_tallB', 'rock_tallC'].filter((n) => kit[n]);
+    const small = ['rock_smallA', 'rock_smallC', 'rock_smallE'].filter((n) => kit[n]);
+    const place = (names: string[], count: number, scale: [number, number], near: number, collide: boolean) =>
+      names.forEach((name) => instance(kit[name], Math.round(count / names.length), () => {
+        const z = rnd(-110, 110), x = Math.random() < near ? pathX(z) + (Math.random() < 0.5 ? -1 : 1) * rnd(2.2, 7) : rnd(-HALF_W, HALF_W);
+        if (!offStream(x, z) || nearEnds(x, z) || !offTrail(x, z, 1.8)) return null;
+        const s = rnd(scale[0], scale[1]);
+        if (collide && s > 1.6) colliders.push({ x, z, r: 0.42 * s });
+        return M.compose(P.set(x, groundY(x, z) - 0.06, z), Q.setFromEuler(new THREE.Euler(0, rnd(0, 6.28), 0)), S.set(s, s * rnd(0.8, 1.15), s));
+      }));
+    place(big, 40, [1.2, 3.2], 0.55, true);
+    place(tall, 10, [1.1, 2.0], 0.2, true);
+    place(small, 70, [1.0, 2.4], 0.75, false);
+  } else {
     const g = new THREE.DodecahedronGeometry(0.6, 1);
     const p = g.attributes.position;
     for (let i = 0; i < p.count; i++) { const v = new THREE.Vector3().fromBufferAttribute(p, i); v.multiplyScalar(1 + Math.sin(v.x * 5) * 0.08 + Math.cos(v.z * 4) * 0.08); v.y *= 0.65; p.setXYZ(i, v.x, v.y, v.z); }
@@ -290,6 +364,26 @@ export function buildWorld(scene: THREE.Scene, o: WorldOpts) {
     }
     ferns.castShadow = true; ferns.receiveShadow = true;
     scene.add(ferns);
+  }
+
+  /* ---------- Kenney undergrowth: bushes, stumps, mushrooms and a few flowers by the trail ---------- */
+  if (kit?.plant_bush) {
+    const scatter = (names: string[], count: number, scale: [number, number], band: [number, number], solid = 0) =>
+      names.filter((n) => kit[n]).forEach((name, _i, arr) => instance(kit[name], Math.round(count / arr.length), () => {
+        const z = rnd(-112, 112), x = pathX(z) + (Math.random() < 0.5 ? -1 : 1) * rnd(band[0], band[1]);
+        if (!offStream(x, z) || nearEnds(x, z)) return null;
+        const s = rnd(scale[0], scale[1]);
+        if (solid) colliders.push({ x, z, r: solid * s });
+        return M.compose(P.set(x, groundY(x, z) - 0.03, z), Q.setFromAxisAngle(UP, rnd(0, 6.28)), S.setScalar(s));
+      }));
+    const k = o.lite ? 0.6 : 1;
+    scatter(['plant_bush', 'plant_bushLarge', 'plant_bushDetailed'], Math.round((snow ? 50 : 140) * k), [2.2, 3.6], [2.6, 12]);
+    scatter(['stump_old', 'stump_oldTall', 'stump_roundDetailed'], 22, [2.6, 3.6], [3, 14], 0.16);
+    scatter(['log_stack'], 3, [2.6, 3.0], [4.5, 9], 0.3);
+    if (!snow) {
+      scatter(['mushroom_redGroup', 'mushroom_tanGroup', 'mushroom_tanTall'], Math.round(36 * k), [1.6, 2.6], [1.6, 5]);
+      scatter(['flower_purpleA', 'flower_yellowB'], Math.round(30 * k), [1.8, 2.6], [1.6, 4]);
+    }
   }
 
   /* ---------- grass blades along the trail ---------- */
