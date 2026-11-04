@@ -3,9 +3,21 @@ import { useNavigate } from 'react-router';
 import { diffStars } from '../data/conditions';
 import { MAX_TOOLS, TOOLS, type ToolId } from '../data/tools';
 import { useGame } from '../GameContext';
-import { CheckIcon, TOOL_ICON } from './Icons';
+import { CheckIcon } from './Icons';
+import bellImage from '../assets/tools/bell.png';
+import radioImage from '../assets/tools/radio.png';
+import sprayImage from '../assets/tools/spray.png';
+import packImage from '../assets/tools/pack.png';
+import helmetImage from '../assets/tools/helmet.png';
 import StageArt from './StageArt';
 
+const TOOL_IMAGE: Record<ToolId, string> = {
+  bell: bellImage,
+  radio: radioImage,
+  spray: sprayImage,
+  pack: packImage,
+  helmet: helmetImage,
+};
 export default function ToolSelectScreen() {
   const navigate = useNavigate();
   const { setup, picked, setPicked, startRun } = useGame();
@@ -62,7 +74,7 @@ export default function ToolSelectScreen() {
                 onClick={() => toggle(k)}
               >
                 <span className="mchk" aria-hidden="true"><CheckIcon /></span>
-                <span className="mti">{TOOL_ICON[k]}</span>
+                <span className="mti"><img src={TOOL_IMAGE[k]} alt="" aria-hidden="true" draggable={false} /></span>
                 <span className="mtn">{TOOLS[k].name}</span>
               </button>
             );

@@ -89,11 +89,20 @@
 .mtool.dim{opacity:.45}
 .mti{display:grid;place-items:center;color:var(--c-gold)}
 .mti svg{width:clamp(36px,8vh,100px);height:clamp(36px,8vh,100px)}
+.mti{display:grid;place-items:center;flex:none;width:100%;min-width:0;color:var(--c-gold)}
+.mti img{display:block;width:clamp(79.2px,17.6vh,220px);max-width:100%;height:clamp(79.2px,17.6vh,220px);object-fit:contain;opacity:1;visibility:visible}
 .mtn{font-size:clamp(13px,2.5vh,26px);font-weight:700;line-height:1.3;text-align:center}
 .mchk{position:absolute;top:clamp(6px,1.2vh,14px);right:clamp(8px,1.4vh,16px);display:none;color:#7be495}
 .mchk svg{width:clamp(22px,3.6vh,40px);height:clamp(22px,3.6vh,40px);stroke-width:3.4}
 .mtool.on .mchk{display:block;animation:chkPop .28s cubic-bezier(.3,1.6,.5,1)}
 .tool-desc{max-width:34em;min-height:3.2em;margin:0;text-align:center;font-size:clamp(13px,2.4vh,22px);line-height:1.6;color:rgba(243,236,217,.9);text-shadow:0 1px 6px rgba(0,0,0,.9);text-wrap:pretty;word-break:auto-phrase}
+
+.scr-tools .mbtn.go:not(:disabled) span{text-shadow:0 0 6px #ffffffe5,0 0 17px #ffffff80}
+.scr-tools .mbtn.go{transition:background .15s,border-color .15s,box-shadow .15s,opacity .15s}
+.scr-tools .mbtn.go span{transition:text-shadow .15s}
+.scr-tools .mbtn.go svg{transition:filter .15s}
+.scr-tools .mchk svg{overflow:visible;filter:drop-shadow(0 0 5px #7be495ea) drop-shadow(0 0 12.5px #7be49580)}
+.scr-tools .scr-sub:not(.warn){text-shadow:0 2px 8px #000c,0 0 7.5px #f3ecd9bf,0 0 20px #f3ecd96a}
 
 @media (max-height:420px){
   .tool-desc{min-height:0}
