@@ -10,6 +10,7 @@ import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js
 import { enhance } from './materials';
 import { furStrands, furTexture, iconTexture } from './textures';
 import { getBearModel } from './bearModel';
+import { getCritterModel } from './critterModel';
 
 export type BearKind = 'tsuki' | 'higuma';
 
@@ -374,6 +375,12 @@ export function makeCritter(kind: CritterKind) {
   const g = new THREE.Group();
   const mat = (c: number, e = 0) => enhance(new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, emissive: e }), { rim: [0.12, 0.14, 0.18] });
   const add = (geo: THREE.BufferGeometry, m: THREE.Material, x: number, y: number, z: number, sx = 1, sy = 1, sz = 1) => { const ms = new THREE.Mesh(geo, m); ms.position.set(x, y, z); ms.scale.set(sx, sy, sz); ms.castShadow = true; g.add(ms); return ms; };
+  const model = getCritterModel(kind);
+  if (model) {
+    /* the low-poly model, in its own colours (each animal gets its own material, so the wolf can fade on its own) */
+    add(model, enhance(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.88, side: THREE.DoubleSide, color: 0x8c8c8c }), { rim: [0.1, 0.12, 0.16] }), 0, 0, 0).receiveShadow = true;
+    return g;
+  }
   const sph = new THREE.SphereGeometry(1, 14, 10);
   if (kind === 'rabbit') {
     const m = mat(0x9a9088);
