@@ -8,7 +8,7 @@ bpy.ops.wm.open_mainfile(filepath=f'{d}/split.blend')
 spec = importlib.util.spec_from_file_location('fix', fixp); fx = importlib.util.module_from_spec(spec); spec.loader.exec_module(fx)
 ob = [o for o in bpy.data.objects if o.type == 'MESH' and (o.name[-4:] if '.' in o.name else 'base') == key][0]
 for o in [o for o in bpy.data.objects if o is not ob]: bpy.data.objects.remove(o)
-cols = fx.fix(key, np.load(f'{d}/{key}_cols.npy'), np.load(f'{d}/{key}_geo.npy'))
+raw = np.load(f'{d}/{key}_cols.npy')
 me = ob.data
 # bake transform, turn nose (-x) to -y (= three.js +z), scale, feet to 0
 me.transform(ob.matrix_world); ob.matrix_world = Matrix()
@@ -32,6 +32,9 @@ me.transform(Matrix.Translation(Vector((-(mn[0] + mx[0]) / 2, 0, -mn[2]))))
 me.transform(Matrix.Scale(s, 4))
 me.transform(Matrix.Translation(Vector((0, -(nose_y * 0 + (mn[1]) * s) - 1.83 + 0, 0))))
 vs = np.array([v.co[:] for v in me.vertices]); print('bounds', vs.min(0).round(2), vs.max(0).round(2))
+# colour fixes are worked out in the game frame (x = sideways, -y = toward the nose, z = up, metres)
+geo = np.array([[*p.center[:], *p.normal[:]] for p in me.polygons])
+cols = fx.fix(key, raw, geo)
 a = me.color_attributes.new('Col', 'BYTE_COLOR', 'CORNER')
 lin2srgb = lambda c: np.clip(c, 0, 1) ** (1 / 2.2)
 for p, c in zip(me.polygons, cols):
