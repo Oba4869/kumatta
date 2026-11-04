@@ -60,7 +60,7 @@ npm run dev   # http://localhost:5173
 ## 素材
 
 - 3Dの森の一部（木・岩・切り株・倒木・茂み・キノコ・花）：Kenney「Nature Kit」（CC0）https://kenney.nl/assets/nature-kit
-- クマの3Dモデル：チームで用意した参考画像から Tripo AI（無料プラン、CC BY 4.0）で生成し、Blender で整えたもの（手順は `tools/bear-models/`）
+- クマと動物（ウサギ・タヌキ・エゾオオカミ）の3Dモデル：チームで用意した参考画像から Tripo AI（無料プラン、CC BY 4.0）で生成し、Blender で整えたもの（手順は `tools/bear-models/`）
 
 ## 技術スタック
 
