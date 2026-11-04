@@ -57,6 +57,10 @@ npm install
 npm run dev   # http://localhost:5173
 ```
 
+## 素材
+
+- 3Dの森の一部（木・岩・切り株・倒木・茂み・キノコ・花）：Kenney「Nature Kit」（CC0）https://kenney.nl/assets/nature-kit
+
 ## 技術スタック
 
 - **React 19 + TypeScript**（Vite）
