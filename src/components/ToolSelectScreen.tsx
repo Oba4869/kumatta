@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import { diffStars } from '../data/conditions';
 import { MAX_TOOLS, TOOLS, type ToolId } from '../data/tools';
 import { useGame } from '../GameContext';
 import { CheckIcon } from './Icons';
@@ -73,7 +74,6 @@ export default function ToolSelectScreen() {
                 onClick={() => toggle(k)}
               >
                 <span className="mchk" aria-hidden="true"><CheckIcon /></span>
-                <span className="mti">{TOOL_ICON[k]}</span>
                 <span className="mti"><img src={TOOL_IMAGE[k]} alt="" aria-hidden="true" draggable={false} /></span>
                 <span className="mtn">{TOOLS[k].name}</span>
               </button>
