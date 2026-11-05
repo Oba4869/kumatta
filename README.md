@@ -1,15 +1,25 @@
 # くまった
 
+![「くまった！ ― クマからの避難 ―」のタイトル画面。夜の森とクマ出没注意の標識](docs/title-screen.png)
+
 **走りたくなる、その一瞬をこらえろ。**
 
 クマに出会った瞬間の「とっさの判断」を、ゲームで体に覚えさせるWebアプリです。
 反射神経といっても「速く逃げる」ではありません。逃げたくなる衝動をこらえて、**正しい行動をすばやく選ぶ**力を鍛えます。
 
-## なぜ作ったか
+## なぜ作ったか（きっかけ）
 
 - クマの出没と人身被害が全国で増えていて、登山者だけでなく通学路でも出会う可能性がある
 - 対処法は「走らない・背中を見せない・ゆっくり後退」と知っていても、本番では体が動かない
 - 知識を読むだけでなく、**手を動かして何度も練習できる**教材がほしかった
+
+## 実際の画面
+
+| 山を選ぶ | 持ち物を選ぶ | 夜の森を進む |
+|---|---|---|
+| ![山選択画面（北海道の山）](docs/screen-stage.png) | ![持ち物選択画面](docs/screen-tools.png) | ![プレイ画面（夜の森）](docs/screen-play.jpg) |
+
+<!-- 動作の様子（動画）を載せるときは、ここに貼る -->
 
 ## 遊び方
 
@@ -31,6 +41,18 @@
 | 図鑑 | 11種類の生き物（ノーマル〜激レア）。激レアは北海道の霧や初雪の日にだけ出る幻のエゾオオカミ |
 | レベルとごほうび | Lv.1〜20。Lv.3でクマの視界表示が消えて難しくなる。Lv.12で金、Lv.15で虹、Lv.20で「頂点」仕様のプレイヤーカード |
 | バッジ | 12種類。記録とバッジは正しい行動をしたときだけもらえる |
+
+## こだわったところ
+
+- **「走りたくなる衝動をこらえる」を、ゲームの仕組みにした**：目を逸らす、背中を見せる、走るとクマの追撃ゲージがたまり、突進される。正しい行動（走らず、目を逸らさず、ゆっくり後ずさり）をしたときだけ、警戒が下がる。
+- **クマが「考えて」動く**：巡回 → 警戒 → 威嚇（立ち上がる）→ 突進。視界・距離・足音・風上のにおいで気づき、子グマに近づくと母グマがすぐ威嚇する。
+- **夜の森の空気**：霧、月明かり、懐中電灯の光の筋、ホタル。ポストエフェクトで、危険が近づくと画面が赤くなる。
+- **音で位置が分かる**：クマの唸り声や足音が、聞こえる方向から鳴る（後ろからの音はこもる）。
+- **山ごとに、有効な道具と気をつけることが変わる**：風向き、霧、夕方、沢の音、北海道のヒグマ。毎回同じ答えにならない。
+- **正解は公式資料にもとづく**：結果画面の「ふりかえり」に、出典つきの解説が出る。
+- **素材が読み込めなくても遊べる**：Kenney やクマの3Dモデルが読み込めないときは、従来の形にもどして表示する。
+- **画面の作り込み**：山ごとのイラストを SVG で描いた。山選択は ◀ ▶（キーボード・スワイプも可）、持ち物選択は選ぶと説明が出る。
+- **チーム開発の進め方**：ブランチ名の規則（feat / fix / ui / docs）、プルリクエスト、CI の自動チェック、`main` へのマージで自動公開。
 
 ## 内容の根拠
 
@@ -79,14 +101,7 @@ npm run dev   # http://localhost:5173
 
 ## 技術スタック
 
-![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=for-the-badge)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white&style=for-the-badge)
-![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white&style=for-the-badge)
-![Three.js](https://img.shields.io/badge/Three.js-WebGL-000000?logo=threedotjs&logoColor=white&style=for-the-badge)
-![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge)
-![React Router](https://img.shields.io/badge/React_Router-8-CA4245?logo=reactrouter&logoColor=white&style=for-the-badge)
-![Blender](https://img.shields.io/badge/Blender-3D%E3%83%A2%E3%83%87%E3%83%AB-E87D0D?logo=blender&logoColor=white&style=for-the-badge)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-%E8%87%AA%E5%8B%95%E5%85%AC%E9%96%8B-2088FF?logo=githubactions&logoColor=white&style=for-the-badge)
+![技術スタック：React・TypeScript・Vite・React Router、Three.js・WebGL・Blender、GitHub・GitHub Actions、Node.js・npm・Git](docs/tech-stack.png)
 
 - **React 19 + TypeScript**（Vite）
 - **Tailwind CSS v4**（色はCSS変数のデザイントークンに対応。ライト／ダークモード対応）
@@ -160,6 +175,16 @@ npm run preview   # ビルド結果の確認
 2. リポジトリの **Settings → Pages** を開き、**Source** を「**GitHub Actions**」にする
 3. **Actions** タブで「Deploy to GitHub Pages」が緑になったら完了
 4. `https://<ユーザー名>.github.io/<リポジトリ名>/` で遊べる
+
+## 今後の展望（技育博・リリースに向けて）
+
+- **スマホで遊べる状態にする**：実機で、スティックとボタン、縦持ち・横持ちを確認して調整する。
+- **読み込みを軽くする**：ビルド時に JavaScript が大きい（約 940 kB）という警告が出ているので、コードと3Dモデルを分けて読み込む。
+- **見た目を磨く**：山のイラストを本格的な画像にし、動作の様子を動画で紹介する。
+- **音を増やす**：BGM や、メニューの操作音を足す。
+- **遊びの幅を広げる**：山・生き物・バッジを増やし、「ふりかえり」の解説を充実させる。
+- **誰でも遊べるようにする**：キーボード操作と、スクリーンリーダーへの対応を見直す。
+- **公開に向けて**：公開用のアドレスと、素材のクレジット表記（CC BY 4.0 を含む）を整える。
 
 ## チーム
 
