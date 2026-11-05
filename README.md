@@ -79,6 +79,15 @@ npm run dev   # http://localhost:5173
 
 ## 技術スタック
 
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=white&style=for-the-badge)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.9-3178C6?logo=typescript&logoColor=white&style=for-the-badge)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white&style=for-the-badge)
+![Three.js](https://img.shields.io/badge/Three.js-WebGL-000000?logo=threedotjs&logoColor=white&style=for-the-badge)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4-06B6D4?logo=tailwindcss&logoColor=white&style=for-the-badge)
+![React Router](https://img.shields.io/badge/React_Router-8-CA4245?logo=reactrouter&logoColor=white&style=for-the-badge)
+![Blender](https://img.shields.io/badge/Blender-3D%E3%83%A2%E3%83%87%E3%83%AB-E87D0D?logo=blender&logoColor=white&style=for-the-badge)
+![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-%E8%87%AA%E5%8B%95%E5%85%AC%E9%96%8B-2088FF?logo=githubactions&logoColor=white&style=for-the-badge)
+
 - **React 19 + TypeScript**（Vite）
 - **Tailwind CSS v4**（色はCSS変数のデザイントークンに対応。ライト／ダークモード対応）
 - **React Router**（画面遷移）
