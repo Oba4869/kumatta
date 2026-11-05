@@ -9,6 +9,8 @@ import * as THREE from 'three';
 import { mergeGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { enhance } from './materials';
 import { furStrands, furTexture, iconTexture } from './textures';
+import { getBearModel } from './bearModel';
+import { getCritterModel } from './critterModel';
 
 export type BearKind = 'tsuki' | 'higuma';
 
@@ -257,7 +259,44 @@ export function makeBear(kind: BearKind, cub = false, lite = false): BearRig {
   icon.scale.set(0.8 / S, 0.8 / S, 1); icon.position.y = 2.9; icon.visible = false; icon.renderOrder = 20;
   root.add(icon);
 
-  return { root, hips, body, head, jaw, ears, legs, eyeMat, icon, cone, coneMat, breath: new THREE.Vector3(0, -0.06, tipZ + 0.05) };
+  let breath = new THREE.Vector3(0, -0.06, tipZ + 0.05);
+  const model = getBearModel(kind);
+  if (model) {
+    /* swap the built-in furry bear for the low-poly model, keeping the same pivots so all the animation still works */
+    const HIPS = new THREE.Vector3(0, 0.95, -0.55);
+    const mat = modelMat(kind, rim);
+    const put = (g: THREE.Object3D, geo: THREE.BufferGeometry, at: THREE.Vector3) => {
+      const m = new THREE.Mesh(geo, mat); m.position.copy(at); m.castShadow = true; m.receiveShadow = true; g.add(m);
+    };
+    body.clear();
+    head.clear();
+    for (const c of [...hips.children]) if (c !== body && c !== head && !legs.includes(c as THREE.Group)) hips.remove(c);
+    put(body, model.body.geo, HIPS.clone().negate());
+    for (const e of model.eyes) {
+      const glint = new THREE.Mesh(new THREE.SphereGeometry(0.03, 8, 6), eyeMat);
+      glint.position.copy(e).sub(HIPS);
+      body.add(glint);
+    }
+    model.legs.forEach((part, i) => {
+      const g = legs[i];
+      g.clear();
+      g.position.copy(part.pivot);
+      if (i < 2) g.position.sub(HIPS);
+      put(g, part.geo, new THREE.Vector3());
+    });
+    breath = model.nose.clone().sub(HIPS).sub(head.position).add(new THREE.Vector3(0, -0.04, 0.06));
+  }
+
+  return { root, hips, body, head, jaw, ears, legs, eyeMat, icon, cone, coneMat, breath };
+}
+
+const modelMats = new Map<BearKind, THREE.Material>();
+/** Flat-shaded faces in the model's own colours, with the same moonlit rim as the rest of the forest. */
+function modelMat(kind: BearKind, rim: [number, number, number]) {
+  if (!modelMats.has(kind)) {
+    modelMats.set(kind, enhance(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.88, side: THREE.DoubleSide, color: kind === 'higuma' ? 0xa89c94 : 0xffffff }), { rim: rim.map((v) => v * 0.8) as [number, number, number], rimPower: 2.4 }));
+  }
+  return modelMats.get(kind)!;
 }
 
 export const ICONS = {
@@ -336,6 +375,12 @@ export function makeCritter(kind: CritterKind) {
   const g = new THREE.Group();
   const mat = (c: number, e = 0) => enhance(new THREE.MeshStandardMaterial({ color: c, roughness: 0.9, emissive: e }), { rim: [0.12, 0.14, 0.18] });
   const add = (geo: THREE.BufferGeometry, m: THREE.Material, x: number, y: number, z: number, sx = 1, sy = 1, sz = 1) => { const ms = new THREE.Mesh(geo, m); ms.position.set(x, y, z); ms.scale.set(sx, sy, sz); ms.castShadow = true; g.add(ms); return ms; };
+  const model = getCritterModel(kind);
+  if (model) {
+    /* the low-poly model, in its own colours (each animal gets its own material, so the wolf can fade on its own) */
+    add(model, enhance(new THREE.MeshStandardMaterial({ vertexColors: true, flatShading: true, roughness: 0.88, side: THREE.DoubleSide, color: 0x8c8c8c }), { rim: [0.1, 0.12, 0.16] }), 0, 0, 0).receiveShadow = true;
+    return g;
+  }
   const sph = new THREE.SphereGeometry(1, 14, 10);
   if (kind === 'rabbit') {
     const m = mat(0x9a9088);

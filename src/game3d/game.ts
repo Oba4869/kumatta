@@ -25,6 +25,8 @@ import { ICONS, makeBear, makeCritter, makeHand, makeHiker, type BearKind, type 
 import { makePost } from './post';
 import { softDot } from './textures';
 import { getKit, loadKit } from './kit';
+import { getBearModel, loadBears } from './bearModel';
+import { loadCritters } from './critterModel';
 import { buildWorld, GOAL_Z, groundY, HALF_W, pathX, START_Z, type Look, type World } from './world';
 
 export interface EngineSetup {
@@ -259,10 +261,10 @@ export class Game3D {
   private gone = false;
   private kitWaited = false;
   start() {
-    /* the forest models load in the background from page start; wait for them the first time */
-    if (!getKit() && !this.kitWaited) {
+    /* the forest and bear models load in the background from page start; wait for them the first time */
+    if ((!getKit() || !getBearModel(this.kind)) && !this.kitWaited) {
       this.kitWaited = true;
-      loadKit().then(() => { if (!this.gone) this.start(); });
+      Promise.all([loadKit(), loadBears(), loadCritters()]).then(() => { if (!this.gone) this.start(); });
       return;
     }
     const canvas = this.$<HTMLCanvasElement>('#g3d');
