@@ -59,7 +59,11 @@ Node.js 22 以上を使ってください。
 | 3Dゲーム本体（クマのAI、操作、HUD） | `src/game3d/game.ts` |
 | 3Dの見た目（森、クマ、光） | `src/game3d/world.ts` `actors.ts` `materials.ts` `post.ts` |
 | 効果音 | `src/game3d/audio3d.ts` |
-| スタート画面 | `src/components/StartScreen.tsx` `HeroScene.tsx` `src/start.css` |
+| タイトル・山選択・持ち物選択 | `src/components/TitleScreen.tsx` `StageSelectScreen.tsx` `ToolSelectScreen.tsx` `StageArt.tsx` `HeroScene.tsx` `src/menu.css` |
+| 画面の遷移（パス）・選んだ内容の受け渡し | `src/App.tsx` `src/GameContext.tsx`（全員が触りやすいので、変えるときは声をかける） |
+| 3Dの森の素材（Kenney） | `src/game3d/kit.ts` `src/assets/nature/` |
+| クマ・小動物の3Dモデル | `src/game3d/bearModel.ts` `critterModel.ts` `src/assets/bears/` `critters/`（作り方は `tools/bear-models/README.md`） |
+| 持ち物の画像 | `src/assets/tools/` `src/components/ToolSelectScreen.tsx` |
 | 結果画面 | `src/components/ResultScreen.tsx` `src/result.css` |
 | ゲーム中の画面の部品 | `src/components/PlayScreen.tsx` `src/index.css`（`.g3-` で始まる部分） |
 | 色・余白などの共通ルール | `src/ui.css` |
