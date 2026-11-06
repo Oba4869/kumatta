@@ -4,6 +4,7 @@ import { GameEngine, type EngineSetup } from '../game/engine';
 import type { Outcome } from '../game/types';
 import { TOOL_ICON } from './Icons';
 import { RevealLayers, SwipeField } from './SwipeField';
+import { enterLandscape } from '../lib/landscape';
 
 interface Props {
   setup: EngineSetup;
@@ -29,6 +30,7 @@ export default function PlayScreen({ setup, onDone, onQuit }: Props) {
     });
     engine.start();
     document.body.classList.add('playing');
+    enterLandscape(); /* usually already done by an earlier tap; harmless if not. The app stays landscape after the run. */
     return () => {
       engine.destroy();
       document.body.classList.remove('playing');
@@ -40,6 +42,11 @@ export default function PlayScreen({ setup, onDone, onQuit }: Props) {
     <div className="play g3" ref={root}>
       <div className="play-inner">
         <canvas id="g3d" aria-label="夜の森を進む3Dゲーム画面" />
+        <div className="g3-rotate" role="alert">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="22" y="8" width="20" height="36" rx="4" /><path d="M14 50c6 6 30 6 36 0M44 46l6 4-6 4" /></svg>
+          <p>スマホを<b>横向き</b>にしてください</p>
+          <small>横にすると、ゲームが始まります</small>
+        </div>
         <div className="g3-vign" id="vign" aria-hidden="true" />
         <div className="g3-flash" id="flash" aria-hidden="true" />
 

@@ -25,6 +25,7 @@ import { ICONS, makeBear, makeCritter, makeHand, makeHiker, type BearKind, type 
 import { makePost } from './post';
 import { softDot } from './textures';
 import { getKit, loadKit } from './kit';
+import { portraitQuery } from '../lib/landscape';
 import { getBearModel, loadBears } from './bearModel';
 import { loadCritters } from './critterModel';
 import { buildWorld, GOAL_Z, groundY, HALF_W, pathX, START_Z, type Look, type World } from './world';
@@ -115,6 +116,8 @@ export class Game3D {
   private critters: Critter[] = [];
   private keys: Record<string, boolean> = {};
   private touch = { x: 0, y: 0, run: false, guard: false, back: false };
+  /** a phone held upright: the game waits behind the "turn your phone" notice */
+  private upright = portraitQuery();
   private coarse = matchMedia('(pointer:coarse)').matches;
   private promptKey = '';
   private mouseDrag = false;
@@ -148,6 +151,12 @@ export class Game3D {
     this.quiet = !!c.quiet || wx === 'snow';
     this.windy = !!c.gusty;
     this.sprayMax = c.higuma ? 4.4 : 5.5;
+    /* turning the phone upright mid-run: let go of the stick and buttons so nothing keeps moving */
+    this.upright.addEventListener('change', () => {
+      if (!this.upright.matches) return;
+      this.touch = { x: 0, y: 0, run: false, guard: false, back: false };
+      for (const k of Object.keys(this.keys)) delete this.keys[k];
+    }, { signal: this.ac.signal });
     this.chaseSpeed = c.higuma ? 12 : 10.5;
     this.guardNeed = 0.75 - (tools.includes('pack') ? 0.15 : 0) - (tools.includes('helmet') ? 0.15 : 0);
     this.sightR = this.look === 'fog' ? 9 : this.look === 'dusk' ? 11 : 12.5;
@@ -583,7 +592,7 @@ export class Game3D {
   private loop = (now: number) => {
     const dt = Math.min(0.05, (now - this.last) / 1000);
     this.last = now;
-    if (this.state === 'play') this.update(dt);
+    if (this.state === 'play' && !this.upright.matches) this.update(dt); /* upright phone = paused */
     else if (this.state === 'intro') this.T += 0; /* paused behind the controls guide */
     this.animate(dt);
     this.post.composer.render(dt);

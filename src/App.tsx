@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router';
 import DexScreen from './components/DexScreen';
 import PlayScreen from './components/PlayScreen';
+import RotateNotice from './components/RotateNotice';
 import ResultScreen from './components/ResultScreen';
 import StageSelectScreen from './components/StageSelectScreen';
 import TitleScreen from './components/TitleScreen';
@@ -108,6 +109,7 @@ export default function App() {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
+      <RotateNotice />
     </GameProvider>
   );
 }

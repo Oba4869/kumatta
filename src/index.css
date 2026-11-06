@@ -619,6 +619,19 @@ body:not(.fp) .g3-cross,body:not(.fp) .g3-beardir{display:none}
 .rules b{color:var(--gold);font-family:'Shippori Mincho B1',serif}
 .g3-help-ok{width:100%}
 
+/* ===== phone held upright during a run: cover the game and ask to turn it (the game waits) ===== */
+.g3-rotate{display:none}
+@media (pointer:coarse) and (orientation:portrait){
+  .g3-rotate{position:absolute;inset:0;z-index:40;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;text-align:center;
+    background:rgba(5,7,12,.94);color:var(--cream)}
+  .g3-rotate svg{width:96px;height:96px;fill:none;stroke:var(--gold);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;animation:turnPhone 2.4s ease-in-out infinite}
+  .g3-rotate p{font-size:20px;font-weight:800;letter-spacing:.04em}
+  .g3-rotate b{color:var(--gold)}
+  .g3-rotate small{font-size:13px;color:var(--muted)}
+}
+@keyframes turnPhone{0%,25%{transform:rotate(0)}55%,85%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){.g3-rotate svg{animation:none}}
+
 /* ===== smartphone landscape (recommended for the 3D game) ===== */
 .rotate-tip{display:none}
 @media (pointer:coarse) and (orientation:portrait){

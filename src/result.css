@@ -113,6 +113,15 @@
   .result .rs-actions{position:static;background:none;margin:0;padding:0}
   .rs-main>*,.rs-side>*{order:0}
 }
+/* ---------- phone held sideways: the wide two-column layout, so the report and the buttons share the short screen ---------- */
+@media (orientation:landscape) and (max-height:520px) and (min-width:700px){
+  .panel.result{column-gap:var(--sp-4);row-gap:0}
+  .rs-main{display:flex;flex-direction:column;gap:var(--sp-4);grid-column:1/8}
+  .rs-side{display:flex;flex-direction:column;gap:var(--sp-3);grid-column:8/13;position:sticky;top:var(--sp-3)}
+  .result .rs-actions{position:static;background:none;margin:0;padding:0}
+  .rs-main>*,.rs-side>*{order:0}
+  .rs-progress,.result .collection{grid-column:auto}
+}
 @media (max-width:380px){.result .badgelist{grid-template-columns:1fr}.rs-stats>div{padding:0 var(--sp-2)}}
 
 /* =====================================================================
