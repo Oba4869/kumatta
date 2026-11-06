@@ -10,6 +10,7 @@ import sprayImage from '../assets/tools/spray.png';
 import packImage from '../assets/tools/pack.png';
 import helmetImage from '../assets/tools/helmet.png';
 import StageArt from './StageArt';
+import { enterLandscape } from '../lib/landscape';
 
 const TOOL_IMAGE: Record<ToolId, string> = {
   bell: bellImage,
@@ -68,7 +69,7 @@ export default function ToolSelectScreen() {
                 key={k}
                 ref={(el) => { toolRefs.current[k] = el; }}
                 type="button"
-                className={'mtool' + (on ? ' on' : '') + (!on && ready ? ' dim' : '')}
+                className={'mtool' + (on ? ' on' : '') + (!on && ready ? ' faded' : '')}
                 aria-pressed={on}
                 aria-label={TOOLS[k].name + '。' + TOOLS[k].desc}
                 onClick={() => toggle(k)}
@@ -85,7 +86,7 @@ export default function ToolSelectScreen() {
       </div>
 
       <footer className="scr-foot">
-        <button className="mbtn go" type="button" onClick={startRun} disabled={!ready}>
+        <button className="mbtn go" type="button" onClick={() => { enterLandscape(); startRun(); }} disabled={!ready}>
           <span>プレイ開始</span>
           <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M4 12h15M13 6l6 6-6 6" /></svg>
         </button>

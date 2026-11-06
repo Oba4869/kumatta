@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router';
 import HeroScene from './HeroScene';
+import { enterLandscape } from '../lib/landscape';
 
 export default function TitleScreen() {
   const navigate = useNavigate();
@@ -18,7 +19,7 @@ export default function TitleScreen() {
         </h1>
 
         <nav className="menu" aria-label="メニュー">
-          <button className="mbtn primary" type="button" onClick={() => navigate('/stages')}>
+          <button className="mbtn primary" type="button" onClick={() => { enterLandscape(); navigate('/stages'); }}>
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" /></svg>
             <span>はじめる</span>
           </button>

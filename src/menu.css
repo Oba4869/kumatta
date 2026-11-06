@@ -86,7 +86,7 @@
   border:3px solid rgba(255,255,255,.45);background:rgba(10,14,24,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);color:#fff;cursor:pointer;transition:border-color .15s,background .15s,opacity .15s}
 .mtool:hover{border-color:rgba(255,255,255,.75)}
 .mtool.on{border-color:#fff;background:rgba(24,32,52,.78)}
-.mtool.dim{opacity:.45}
+.mtool.faded{opacity:.45} /* not ".dim": that class is the play screen's darkening layer (index.css) */
 .mti{display:grid;place-items:center;color:var(--c-gold)}
 .mti svg{width:clamp(36px,8vh,100px);height:clamp(36px,8vh,100px)}
 .mti{display:grid;place-items:center;flex:none;width:100%;min-width:0;color:var(--c-gold)}
@@ -109,3 +109,68 @@
   .mtool{aspect-ratio:auto;padding:8px 6px}
 }
 @media (prefers-reduced-motion:reduce){.stage-card,.mtool.on .mchk{animation:none!important}}
+
+/* ---------- phones held upright ----------
+   The menus are drawn for a wide screen; upright, the header, the stage card and the tool list are re-laid
+   so nothing wraps one letter per line and nothing hides behind the buttons. */
+@media (max-aspect-ratio:1/1){
+  .scr-head{flex-wrap:wrap;row-gap:8px;padding-right:96px}
+  .scr-head h1{white-space:nowrap;font-size:clamp(22px,6.4vw,30px)}
+  .scr-head .scr-chip{flex-basis:100%;width:max-content;flex-grow:0;margin-right:auto;font-size:13px}
+  .scr-sound{height:40px;font-size:13px}
+
+  /* stage select: a tall card filling the width, the arrows sit on its edges */
+  .stage-body{position:relative;gap:0;padding:12px 0}
+  .stage-card{width:min(100%,calc((100dvh - 240px) * 3 / 4));aspect-ratio:3/4}
+  .stage-top{flex-direction:column;align-items:flex-start;gap:4px}
+  .stage-top h2{font-size:clamp(20px,6vw,28px)}
+  .stage-diff{font-size:clamp(14px,4.2vw,18px)}
+  .stage-desc{font-size:clamp(14px,4vw,17px)}
+  .arrow{position:absolute;top:50%;z-index:2;width:44px;height:72px;transform:translateY(-50%)}
+  .arrow:first-child{left:-6px}
+  .arrow:last-child{right:-6px}
+  .arrow:hover{transform:translateY(-50%) scale(1.12)}
+  .arrow:active{transform:translateY(-50%) scale(.94)}
+  .scr-foot{justify-content:center}
+  .mbtn.go{width:100%;min-height:58px;font-size:20px}
+
+  /* tool select: the list scrolls instead of running under the start button */
+  .tools-body{flex:1 0 auto;justify-content:flex-start;padding-top:12px}
+  .scr-sub{font-size:20px}
+  .mtools{gap:10px}
+  .mtool{width:calc((100% - 20px) / 3);max-width:150px;aspect-ratio:auto;padding:12px 4px 10px;gap:8px}
+  .mti img{width:min(64px,100%);height:64px}
+  .mtn{font-size:14px;white-space:nowrap;letter-spacing:0}
+  .tool-desc{font-size:15px;min-height:4.8em}
+}
+
+/* ---------- "turn your phone" notice over the menus (RotateNotice.tsx) ---------- */
+.rotate-notice{position:fixed;inset:0;z-index:50;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;padding:24px;text-align:center;background:rgba(5,7,15,.96);color:#f3ecd9;font-family:var(--font)}
+.rotate-notice svg{width:96px;height:96px;fill:none;stroke:var(--c-gold);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;animation:turnPhone2 2.4s ease-in-out infinite}
+.rotate-notice p{font-size:20px;font-weight:800;letter-spacing:.04em;line-height:1.5}
+.rotate-notice b{color:var(--c-gold)}
+.rotate-notice small{max-width:22em;font-size:13px;line-height:1.6;color:rgba(243,236,217,.75)}
+.rotate-notice .mbtn{width:min(280px,100%)}
+.rotate-skip{margin-top:6px;border:0;background:none;color:rgba(243,236,217,.7);font:600 13px var(--font);text-decoration:underline;cursor:pointer;padding:8px}
+@keyframes turnPhone2{0%,25%{transform:rotate(0)}55%,85%{transform:rotate(-90deg)}100%{transform:rotate(0)}}
+@media (prefers-reduced-motion:reduce){.rotate-notice svg{animation:none}}
+
+/* ---------- phones held sideways: a bigger stage card ----------
+   The screen is only ~390px tall, so the header, dots and button get compact and the card takes the rest,
+   wider than 16:9 (the art is drawn to cover any shape). */
+@media (orientation:landscape) and (max-height:520px){
+  .scr-head{gap:10px}
+  .scr-head h1{font-size:20px}
+  .scr-back{width:40px;height:40px}
+  .stage-body{padding:6px 0;gap:6px}
+  .arrow{width:40px;height:64px}
+  .stage-card{aspect-ratio:auto;height:calc(100dvh - 140px);width:min(100%,760px);border-width:2px;border-radius:16px}
+  .stage-top{padding:12px 18px 28px}
+  .stage-top h2{font-size:22px}
+  .stage-diff{font-size:16px}
+  .stage-desc{padding:28px 18px 12px;font-size:15px}
+  .dots{gap:10px}
+  .dots button{width:10px;height:10px}
+  .scr-foot{padding-top:6px}
+  .scr-stage .mbtn.go,.mbtn.go{min-height:46px;font-size:17px;min-width:200px}
+}
