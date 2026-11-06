@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { useNavigate } from 'react-router';
 import type { Condition } from './data/conditions';
 import { lvInfo } from './data/levels';
@@ -8,10 +8,11 @@ import { drawStage } from './game/run';
 import { scoreRun, type RunResult } from './game/scoring';
 import { applyWeather, type Outcome, type RunSetup } from './game/types';
 import { loadProfile, saveProfile, type Profile } from './lib/profile';
-import { setSoundOn } from './lib/sound';
+import { audio, setSoundOn } from './lib/sound';
 
 interface Game {
   profile: Profile;
+  markSeen: (collection: 'unreadDex' | 'unreadBadges', id: string) => void;
   setup: RunSetup | null;
   picked: ToolId[];
   setPicked: (tools: ToolId[]) => void;
@@ -41,6 +42,14 @@ export function GameProvider({ children }: { children: ReactNode }) {
   const [last, setLast] = useState<Game['last']>(null);
   const [sound, setSound] = useState(true);
 
+  useEffect(() => { saveProfile(profile); }, [profile]);
+
+  const markSeen: Game['markSeen'] = (collection, id) => {
+    setProfile((current) => current[collection].includes(id)
+      ? { ...current, [collection]: current[collection].filter((entry) => entry !== id) }
+      : current);
+  };
+
   const selectStage = (id: Condition['id']) => {
     setSetup(drawStage(profile, id));
     setPicked([]);
@@ -49,6 +58,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   /** Starts (or restarts) a walk with the current mountain and tools. */
   const startRun = () => {
     if (!setup) { navigate('/stages'); return; }
+    audio();
     setPlay((prev) => ({
       key: (prev?.key ?? 0) + 1,
       engine: { cond: applyWeather(setup), wx: setup.wx?.id ?? null, tools: picked, level: lvInfo(profile.xp).l, knownDex: profile.dex },
@@ -58,7 +68,6 @@ export function GameProvider({ children }: { children: ReactNode }) {
 
   const finishRun = (outcome: Outcome) => {
     const result = scoreRun(profile, outcome);
-    saveProfile(result.profile);
     setProfile(result.profile);
     setLast({ outcome, result });
     navigate('/result', { replace: true });
@@ -72,7 +81,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <GameContext.Provider value={{ profile, setup, picked, setPicked, play, last, sound, toggleSound, selectStage, startRun, finishRun }}>
+    <GameContext.Provider value={{ profile, markSeen, setup, picked, setPicked, play, last, sound, toggleSound, selectStage, startRun, finishRun }}>
       {children}
     </GameContext.Provider>
   );

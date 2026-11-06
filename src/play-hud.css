@@ -1,0 +1,195 @@
+/* Neon play HUD. The masks preserve the ten silhouettes in the HUD design sheet. */
+.play.g3 {
+  --plate-bracket: polygon(2.6% 11%, 97.4% 11%, 97.4% 89%, 2.6% 89%);
+  --plate-success: polygon(4.4% 9%, 94.9% 9%, 98.8% 31%, 98.8% 69%, 95.6% 91%, 4.4% 91%, 1.2% 69%, 1.2% 31%);
+  --plate-warning: polygon(5.4% 9%, 14.2% 9%, 16.3% 17%, 82.8% 17%, 85% 9%, 94.2% 9%, 98.8% 37%, 98.8% 66%, 95.2% 91%, 85.1% 91%, 83.1% 83%, 16.5% 83%, 14.4% 91%, 5.4% 91%, 1.2% 65%, 1.2% 35%);
+  --plate-status: polygon(1% 18%, 99% 18%, 99% 80%, 1% 80%);
+  --plate-guard: polygon(18% 15%, 82% 15%, 87.5% 50%, 82% 85%, 18% 85%, 12.5% 50%);
+  --plate-danger: polygon(17% 18%, 89% 18%, 82% 82%, 10% 82%);
+  --plate-spray: polygon(7% 14%, 93% 14%, 98% 50%, 93% 86%, 7% 86%, 2% 50%);
+  --plate-notice: polygon(2% 12%, 7% 12%, 15.5% 65%, 98% 65%, 98% 80%, 15.5% 80%);
+  --plate-retreat: polygon(11% 14%, 89% 14%, 94.5% 50%, 89% 86%, 11% 86%, 5.5% 50%);
+  --plate-arrival: polygon(10.5% 12%, 89.5% 12%, 98.5% 50%, 89.5% 88%, 10.5% 88%, 1.5% 50%);
+  --hud-cyan: #55f5ff;
+  --hud-green: #52ff84;
+  --hud-yellow: #ffe84b;
+  --hud-orange: #ff983c;
+  --hud-red: #ff4060;
+  --hud-violet: #ba9cff;
+  --hud-ice: #e8f9ff;
+  --hud-spray: #f0fbff;
+  --frame-bracket: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M49%206H30V58H49%20M421%206H440V58H421%22%20stroke-width%3D%223.2%22%2F%3E%3Cpath%20d%3D%22M18%2032H29%20M441%2032H452%22%20opacity%3D%22.45%22%2F%3E%3C%2Fsvg%3E");
+  --frame-success: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M38%205H430L446%2019V45L432%2059H38L24%2045V19Z%22%20opacity%3D%22.75%22%2F%3E%3Cpath%20d%3D%22M43%2059h12m5%200h8m5%200h8%20M376%205h12m5%200h8m5%200h8%22%20stroke-width%3D%223%22%2F%3E%3C%2Fsvg%3E");
+  --frame-warning: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M42%205H81L90%2010H376L385%205H426L446%2023V43L430%2059H386L378%2054H91L82%2059H42L24%2042V22Z%22%20opacity%3D%22.75%22%2F%3E%3Cpath%20d%3D%22M385%205H426L446%2023V33%20M24%2042L42%2059H63%22%20stroke-width%3D%224%22%2F%3E%3C%2Fsvg%3E");
+  --frame-status: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M24%2011H446%20M24%2052H446%22%20opacity%3D%22.65%22%2F%3E%3Cpath%20d%3D%22M30%2056H440%22%20stroke-width%3D%225%22%20stroke-dasharray%3D%222%2019%22%20opacity%3D%22.75%22%2F%3E%3C%2Fsvg%3E");
+  --frame-guard: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M97%209H373%20M97%2055H373%20M48%207H25V27H66%20M48%2057H25V37H66%20M422%207H445V27H404%20M422%2057H445V37H404%22%20opacity%3D%22.8%22%2F%3E%3C%2Fsvg%3E");
+  --frame-danger: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M29%2053l31-42h9L38%2053z%20M44%2053l31-42h9L53%2053z%20M59%2053l31-42h9L68%2053z%20M376%2053l31-42h9l-31%2042z%20M391%2053l31-42h9l-31%2042z%20M406%2053l31-42h9l-31%2042z%22%20fill%3D%22white%22%20stroke%3D%22none%22%2F%3E%3Cpath%20d%3D%22M79%2053H377%22%2F%3E%3C%2Fsvg%3E");
+  --frame-spray: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M58%208H45L25%2032L45%2056H58%20M412%208H425L445%2032L425%2056H412%22%20opacity%3D%22.65%22%2F%3E%3Cpath%20d%3D%22M25%2032L40%2017V47Z%20M445%2032L430%2017V47Z%22%20fill%3D%22white%22%20stroke%3D%22none%22%2F%3E%3C%2Fsvg%3E");
+  --frame-notice: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M26%207H49L85%2052H444%22%20opacity%3D%22.8%22%2F%3E%3Cpath%20d%3D%22M52%2022L84%2049H177L165%2057H79L52%2032Z%20M333%2049H426L415%2057H349Z%22%20fill%3D%22white%22%20stroke%3D%22none%22%2F%3E%3C%2Fsvg%3E");
+  --frame-retreat: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M55%208L31%2032L55%2056%20M67%208L43%2032L67%2056%20M415%208L439%2032L415%2056%20M403%208L427%2032L403%2056%22%20stroke-width%3D%222.2%22%2F%3E%3Cpath%20d%3D%22M45%208L21%2032L45%2056%20M425%208L449%2032L425%2056%22%20stroke-width%3D%221%22%20opacity%3D%22.45%22%2F%3E%3C%2Fsvg%3E");
+  --frame-arrival: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%2220%200%20430%2064%22%20preserveAspectRatio%3D%22none%22%20fill%3D%22none%22%20stroke%3D%22white%22%20stroke-width%3D%221.7%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M64%207H406L446%2032L406%2057H64L24%2032Z%22%20opacity%3D%22.75%22%2F%3E%3Cpath%20d%3D%22M64%207H122L110%2014H69L51%2026H34Z%20M64%2057H122L110%2050H69L51%2038H34Z%20M406%207H348L360%2014H401L419%2026H436Z%20M406%2057H348L360%2050H401L419%2038H436Z%22%20fill%3D%22white%22%20stroke%3D%22none%22%2F%3E%3C%2Fsvg%3E");
+}
+
+.play.g3 .play-inner {
+  --cream: var(--hud-cyan);
+  --gold: var(--hud-cyan);
+  --muted: var(--hud-ice);
+  --panel: rgb(9 19 29 / 88%);
+}
+
+.play.g3 :is(.g3-panel, .toolchip, :where(#advice), .g3-prompt, .toast, .callout, .tb, .g3-help-ok, .dim :where(span)) {
+  --neon: var(--hud-cyan);
+  --frame: var(--frame-success); --plate: var(--plate-success);
+  isolation: isolate;
+  color: var(--neon);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  text-shadow: 0 0 5px color-mix(in srgb, var(--neon) 60%, transparent);
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--neon) 52%, transparent));
+}
+.play.g3 :is(.g3-panel, .toolchip, :where(#advice), .g3-prompt, .toast, .callout, .tb, .g3-help-ok, .dim :where(span))::before,
+.play.g3 :is(.g3-panel, .toolchip, :where(#advice), .g3-prompt, .toast, .callout, .tb, .g3-help-ok, .dim :where(span))::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: -1;
+}
+.play.g3 :is(.g3-panel, .toolchip, :where(#advice), .g3-prompt, .toast, .callout, .tb, .g3-help-ok, .dim :where(span))::before {
+  background: color-mix(in srgb, var(--neon) 7%, var(--panel));
+  clip-path: var(--plate);
+}
+.play.g3 :is(.g3-panel, .toolchip, :where(#advice), .g3-prompt, .toast, .callout, .tb, .g3-help-ok, .dim :where(span))::after {
+  background: var(--neon);
+  mask: var(--frame) center / 100% 100% no-repeat;
+}
+
+.play.g3 :is(.toolchip, .g3-view, .g3-help-btn, .g3-help-card, .tb, .g3-help-ok, .dim :where(span)) { position: relative; }
+.play.g3 :is(#advice, .g3-help-card h2) { font-weight: 700; }
+.play.g3 #advice { --frame: var(--frame-bracket); --plate: var(--plate-bracket); padding-inline: 22px; color: var(--neon); background: transparent; border: 0; border-radius: 0; }
+.play.g3 #advice.bad { --neon: var(--hud-orange); --frame: var(--frame-warning); --plate: var(--plate-warning); }
+.play.g3 #advice.good { --neon: var(--hud-green); --frame: var(--frame-success); --plate: var(--plate-success); }
+.play.g3 #advice.arrival { --neon: var(--hud-green); --frame: var(--frame-arrival); --plate: var(--plate-arrival); padding-inline: 44px; }
+.play.g3 #advice.retreat { --neon: var(--hud-yellow); --frame: var(--frame-retreat); --plate: var(--plate-retreat); padding-inline: 38px; }
+.play.g3 :is(.g3-meter, .g3-compass, .g3-wind, .g3-status) { --frame: var(--frame-status); --plate: var(--plate-status); }
+.play.g3 .g3-compass i { background: var(--hud-cyan); color: #09131d; }
+.play.g3 .g3-wind i { background: var(--hud-violet); color: #09131d; }
+.play.g3 .g3-wind { --neon: var(--hud-violet); }
+.play.g3 :is(.g3-prompt, .g3-keys) { --neon: var(--hud-ice); --frame: var(--frame-bracket); --plate: var(--plate-bracket); }
+.play.g3 .g3-prompt { padding-inline: 20px; }
+.play.g3 .g3-prompt[data-action="guard"] { --frame: var(--frame-guard); --plate: var(--plate-guard); padding-inline: 35px; }
+.play.g3 .g3-prompt[data-action="spray"] { --neon: var(--hud-spray); --frame: var(--frame-spray); --plate: var(--plate-spray); padding-inline: 25px; }
+.play.g3 .g3-prompt[data-action="retreat"] { --frame: var(--frame-retreat); --plate: var(--plate-retreat); --neon: var(--hud-yellow); padding-inline: 34px; }
+.play.g3 :is(.g3-keys, .g3-prompt) kbd {
+  background: #09131d;
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  color: inherit;
+  box-shadow: none;
+}
+.play.g3 .toast { --neon: var(--hud-violet); --frame: var(--frame-notice); --plate: var(--plate-notice); padding: 8px 26px 12px; max-width: calc(100% - 24px); pointer-events: none; }
+.play.g3 .callout { padding: 9px 40px; font-size: clamp(30px, 6vw, 48px); }
+.play.g3 .callout.warn { --neon: var(--hud-orange); --frame: var(--frame-warning); --plate: var(--plate-warning); }
+.play.g3 .callout.danger { --neon: var(--hud-red); --frame: var(--frame-danger); --plate: var(--plate-danger); padding-inline: 60px; }
+.play.g3 .callout.ok { --neon: var(--hud-green); }
+.play.g3 .callout .co-back { display: none; }
+.play.g3 .callout .co-front { color: inherit; background: none; }
+.play.g3 .dim span { --neon: var(--hud-red); --frame: var(--frame-warning); --plate: var(--plate-warning); padding: 12px 25px; text-align: center; }
+.play.g3 .tiersub { color: var(--hud-green); text-shadow: 0 0 6px var(--hud-green); }
+.play.g3 .orb { filter: drop-shadow(0 0 8px currentColor); }
+
+.play.g3 .g3-meter .bar {
+  background: #273640;
+  border-radius: 0;
+  overflow: visible;
+}
+.play.g3 .g3-meter .bar i {
+  border-radius: 0;
+  clip-path: polygon(0 0, 100% 0, max(0px, calc(100% - 5px)) 100%, 0 100%);
+}
+.play.g3 #alertbar {
+  --alert-level: 0;
+  --alert-low: color-mix(in srgb, #baff47 clamp(0%, calc(var(--alert-level) * 4%), 100%), var(--hud-green));
+  --alert-mid: color-mix(in srgb, var(--hud-yellow) clamp(0%, calc((var(--alert-level) - 25) * 4%), 100%), var(--alert-low));
+  --alert-high: color-mix(in srgb, var(--hud-orange) clamp(0%, calc((var(--alert-level) - 50) * 4%), 100%), var(--alert-mid));
+  --alert-color: color-mix(in srgb, var(--hud-red) clamp(0%, calc((var(--alert-level) - 75) * 4%), 100%), var(--alert-high));
+  filter: drop-shadow(0 0 5px color-mix(in srgb, var(--alert-color) 55%, transparent));
+}
+.play.g3 #alertbar i {
+  width: calc(var(--alert-level) * 1%);
+  background: var(--alert-color);
+}
+.play.g3 #chasebar { filter: drop-shadow(0 0 5px #ff4060a0); }
+.play.g3 #chasebar i { background: linear-gradient(90deg, var(--hud-orange), var(--hud-red)); }
+.play.g3 :is(.st-patrol, .st-flee) { color: var(--hud-green); }
+.play.g3 .st-alert { color: var(--hud-yellow); }
+.play.g3 .st-threaten { color: var(--hud-orange); }
+.play.g3 .st-chase { color: var(--hud-red); }
+.play.g3 .st-stunned { color: var(--hud-cyan); }
+.play.g3 .g3-meter .state { text-shadow: 0 0 5px currentColor; }
+.play.g3 #spraypips i:not(.used) { background: var(--hud-orange); box-shadow: 0 0 6px var(--hud-orange); }
+.play.g3 .g3-map { box-shadow: 0 0 8px var(--hud-cyan); }
+.play.g3 .g3-cross { background: var(--hud-cyan); box-shadow: 0 0 6px var(--hud-cyan); }
+.play.g3 .g3-stick { border-color: var(--hud-cyan); box-shadow: 0 0 8px #55f5ff80; }
+.play.g3 #knob { border-color: var(--hud-cyan); box-shadow: 0 0 8px #55f5ff80; }
+.play.g3 #knob.run { border-color: var(--hud-red); box-shadow: 0 0 8px var(--hud-red); }
+.play.g3 .stick-lab { text-shadow: 0 0 5px var(--hud-cyan); }
+.play.g3 .stick-run { color: var(--hud-orange); }
+.play.g3 .stick-run { text-shadow: 0 0 5px var(--hud-orange); }
+.play.g3 .tb.back { --neon: var(--hud-yellow); --frame: var(--frame-retreat); --plate: var(--plate-retreat); }
+.play.g3 .tb.spray { --neon: var(--hud-spray); --frame: var(--frame-spray); --plate: var(--plate-spray); }
+.play.g3 .tb.guard { --neon: var(--hud-ice); --frame: var(--frame-guard); --plate: var(--plate-guard); }
+.play.g3 .tb .now { color: inherit; }
+.play.g3 :is(button, .toolchip):focus-visible { outline: 2px solid var(--neon); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  .play.g3 .tb { animation: none; }
+}
+
+/* Restore the original chamfered treatment for the fixed HUD panels. */
+.play.g3 :is(.g3-meter, .g3-status, .g3-keys, .g3-top .g3-panel, .g3-top .toolchip) {
+  --cut: 6px;
+  --neon: #fff;
+  --panel: rgb(255 255 255 / 8%);
+  --plate: polygon(var(--cut) 0, calc(100% - var(--cut)) 0,
+    100% var(--cut), 100% calc(100% - var(--cut)),
+    calc(100% - var(--cut)) 100%, var(--cut) 100%, 0 calc(100% - var(--cut)), 0 var(--cut));
+  font-weight: 400;
+  filter: drop-shadow(0 0 .6px #fff4);
+  text-shadow: 0 0 1px #fff7;
+}
+.play.g3 .play-inner :is(.g3-meter, .g3-status, .g3-keys) { --cut: 12px; }
+.play.g3 :is(.g3-meter, .g3-status, .g3-keys, .g3-top .g3-panel, .g3-top .toolchip)::before {
+  background: var(--panel);
+}
+.play.g3 :is(.g3-meter, .g3-status, .g3-keys, .g3-top .g3-panel, .g3-top .toolchip)::after {
+  mask: none;
+  clip-path: polygon(evenodd,
+    var(--cut) 0, calc(100% - var(--cut)) 0, 100% var(--cut),
+    100% calc(100% - var(--cut)), calc(100% - var(--cut)) 100%, var(--cut) 100%,
+    0 calc(100% - var(--cut)), 0 var(--cut), var(--cut) 0,
+    var(--cut) .75px, .75px var(--cut), .75px calc(100% - var(--cut)),
+    var(--cut) calc(100% - .75px), calc(100% - var(--cut)) calc(100% - .75px),
+    calc(100% - .75px) calc(100% - var(--cut)), calc(100% - .75px) var(--cut),
+    calc(100% - var(--cut)) .75px, var(--cut) .75px);
+}
+.play.g3 :is(.g3-meter .lab, .g3-meter .state, .g3-status b, #spraypips em) { font-weight: 400; }
+.play.g3 :is(.g3-status b, .g3-meter .dist, #spraypips em) { color: #fff; }
+.play.g3 .g3-meter .dist { padding-inline-start: 6px; border-inline-start: 1px solid #fff9; }
+.play.g3 .g3-meter .state { text-shadow: 0 0 1px currentColor; }
+.play.g3 .g3-meter :is(.st-patrol, .st-flee) { color: #9fe3a9; }
+.play.g3 .g3-meter .st-alert { color: #ffd166; }
+.play.g3 .g3-meter .st-threaten { color: #ff8a3d; }
+.play.g3 .g3-meter .st-chase { color: #ff3b30; }
+.play.g3 .g3-meter .st-stunned { color: #86d6ff; }
+.play.g3 .g3-meter .bar { background: rgb(241 231 207 / 12%); overflow: hidden; }
+.play.g3 .g3-meter :is(.bar, .bar i) { border-radius: 2px; clip-path: none; }
+.play.g3 .g3-meter :is(#alertbar, #chasebar) { filter: none; }
+.play.g3 #chasebar i { background: linear-gradient(90deg, #ff6b4a, #ff1f1f); }
+.play.g3 .g3-keys kbd { background: transparent; }
+.play.g3 .g3-top svg { filter: drop-shadow(0 0 3px #fff9); }
+
+.play.g3 .g3-compass { --neon: #fff; }
+.play.g3 .g3-compass i { background: var(--neon); color: #101923; }

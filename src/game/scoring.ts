@@ -69,6 +69,8 @@ export const scoreRun = (prev: Profile, o: Outcome): RunResult => {
   if (newRec) p.best = o.reaction;
   const freshBadges = BADGES.filter((b) => !p.badges[b.id] && b.test(o, rank, p));
   freshBadges.forEach((b) => { p.badges[b.id] = true; });
+  p.unreadDex = [...prev.unreadDex, ...freshDex];
+  p.unreadBadges = [...prev.unreadBadges, ...freshBadges.map((badge) => badge.id)];
   const base = { S: 100, A: 70, B: 40, C: 15 }[rank] + (o.tier ? { rainbow: 30, gold: 15, silver: 5 }[o.tier] : 0);
   const gain = Math.round(base * (1 + (o.cond.diff - 1) * 0.25)) + freshBadges.length * 20 + freshDex.length * 10;
   p.xp += gain;

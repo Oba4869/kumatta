@@ -10,6 +10,7 @@ import './ui.css';
 import './start.css';
 import './result.css';
 import './menu.css';
+import './play-hud.css';
 
 /* start fetching the 3D forest, bear and animal models right away, so the game can begin without waiting */
 loadKit();

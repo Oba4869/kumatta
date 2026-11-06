@@ -21,6 +21,7 @@ import { NOLANE_LV } from '../data/levels';
 import { SwipePad } from '../game/swipe';
 import type { Outcome, PlayCondition, Tier } from '../game/types';
 import { Audio3D } from './audio3d';
+import { audio } from '../lib/sound';
 import { ICONS, makeBear, makeCritter, makeHand, makeHiker, type BearKind, type BearRig, type CritterKind } from './actors';
 import { makePost } from './post';
 import { softDot } from './textures';
@@ -252,7 +253,7 @@ export class Game3D {
     ctx.beginPath(); ctx.moveTo(S, S - 8); ctx.lineTo(S + 6, S + 6); ctx.lineTo(S, S + 3); ctx.lineTo(S - 6, S + 6); ctx.closePath();
     ctx.fill(); ctx.stroke();
     // rim
-    ctx.beginPath(); ctx.arc(S, S, S - 1, 0, Math.PI * 2); ctx.strokeStyle = 'rgba(226,188,114,.75)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.beginPath(); ctx.arc(S, S, S - 1, 0, Math.PI * 2); ctx.strokeStyle = '#fff'; ctx.lineWidth = 1; ctx.stroke();
     // "up = facing" tick
     ctx.fillStyle = 'rgba(226,188,114,.9)'; ctx.beginPath(); ctx.moveTo(S, 2); ctx.lineTo(S + 4, 8); ctx.lineTo(S - 4, 8); ctx.closePath(); ctx.fill();
   }
@@ -486,7 +487,7 @@ export class Game3D {
     hold(this.$('#tBack'), 'back'); hold(this.$('#tGuard'), 'guard');
     const openHelp = () => { if (this.state === 'end') return; this.$('#help').hidden = false; this.state = 'intro'; try { document.exitPointerLock(); } catch { /* ignore */ } };
     this.$('#helpBtn').addEventListener('click', (e) => { e.stopPropagation(); openHelp(); }, sig);
-    this.$('#helpOk').addEventListener('click', (e) => { e.stopPropagation(); this.$('#help').hidden = true; try { localStorage.setItem('bearReflex.help3d', '1'); } catch { /* ignore */ } if (this.state === 'intro') { this.state = 'play'; this.last = performance.now(); } }, sig);
+    this.$('#helpOk').addEventListener('click', (e) => { e.stopPropagation(); audio(); this.$('#help').hidden = true; try { localStorage.setItem('bearReflex.help3d', '1'); } catch { /* ignore */ } if (this.state === 'intro') { this.state = 'play'; this.last = performance.now(); } }, sig);
     this.$('#tSpray').addEventListener('pointerdown', (e) => { e.preventDefault(); this.useSpray(); }, sig);
     this.$('#viewBtn').addEventListener('click', (e) => { e.stopPropagation(); this.toggleView(); }, sig);
     this.$('#quit').addEventListener('click', () => this.hooks.onQuit?.(), sig);
@@ -501,14 +502,15 @@ export class Game3D {
   }
 
   /* ================= HUD helpers ================= */
-  private say(text: string, kind: 'hint' | 'good' | 'bad' = 'hint', secs = 1.6, prio = 1) {
+  private say(text: string, kind: 'hint' | 'good' | 'bad' | 'arrival' = 'hint', secs = 1.6, prio = 1, retreat = false) {
     if (this.T < this.msg.until && prio < this.msg.prio) return;
     const el = this.$('#advice');
+    const style = retreat ? kind + ' retreat' : kind;
     if (this.msg.text !== text) {
       el.textContent = text;
-      el.className = kind;
+      el.className = style;
       if (!reduce()) el.animate([{ transform: 'translate(-50%,0) scale(.9)', opacity: 0.4 }, { transform: 'translate(-50%,0) scale(1)', opacity: 1 }], { duration: 260, easing: 'cubic-bezier(.2,1.6,.4,1)' });
-    } else el.className = kind;
+    } else el.className = style;
     this.msg = { text, until: this.T + secs, prio };
   }
   private toast(t: string) {
@@ -699,7 +701,12 @@ export class Game3D {
       this.stats.cubNear = true;
       this.say('子グマに近づくな！ 近くに母グマがいる', 'bad', 1.2, 3);
       const m = b.mother;
-      if (m && (m.state === 'patrol' || m.state === 'alert')) { m.state = 'threaten'; m.alert = Math.max(m.alert, 85); this.snd.growl(m); this.stats.motherMet = true; }
+      if (m && (m.state === 'patrol' || m.state === 'alert')) {
+        m.state = 'threaten'; m.alert = Math.max(m.alert, 85); m.rearT = 0; m.growlT = 2.4;
+        this.snd.growl(m);
+        this.fx?.callout('威嚇！', 'warn');
+        this.stats.motherMet = true;
+      }
     }
 
     /* --- the right button at the right moment --- */
@@ -721,6 +728,7 @@ export class Game3D {
       if (key !== this.promptKey) {
         this.promptKey = key;
         const pr = this.$('#prompt');
+        pr.dataset.action = sprayReady ? 'spray' : guardReady ? 'guard' : engaged ? 'retreat' : 'move';
         pr.innerHTML = html; pr.hidden = !html;
         if (html && !reduce()) pr.animate([{ opacity: 0, transform: 'translate(-50%,6px)' }, { opacity: 1, transform: 'translate(-50%,0)' }], { duration: 220 });
       }
@@ -731,15 +739,15 @@ export class Game3D {
     else if (lookAway) this.say(awayLooking ? '背中を見せるな！ クマを見たまま後ずさり' : '目を逸らすな！ クマを見ながらゆっくり後退', 'bad', 0.6, 3);
     else if (running && nearest < 22) this.say('走ると足音で気づかれる。クマの近くでは走らない', 'bad', 0.8, 2);
     else if (focus?.state === 'chase') this.say(this.sprays ? '突進してくる！ 走っても逃げきれない — 引きつけてスプレー！' : '突進してくる！ 走っても逃げきれない', 'bad', 0.5, 3);
-    else if (focus?.state === 'threaten') this.say(backing ? '目を逸らさずに後ずさり中… ' + (this.sprays ? '近づいてきたら引きつけてスプレー' : '迫ってきたら防御姿勢') : this.sprays ? '立ち上がって威嚇している！ 数メートルまで引きつけてスプレー' : '威嚇している！ ぶつかる前に防御姿勢（E）', 'hint', 0.5, 2);
-    else if (focus?.state === 'alert') this.say(backing ? '目を逸らさずにゆっくり後ずさり中…' : 'クマがこちらを見ている。走らず、目を離さずにゆっくり後退（S）', backing ? 'good' : 'hint', 0.5, 2);
+    else if (focus?.state === 'threaten') this.say(backing ? '目を逸らさずに後ずさり中… ' + (this.sprays ? '近づいてきたら引きつけてスプレー' : '迫ってきたら防御姿勢') : this.sprays ? '立ち上がって威嚇している！ 数メートルまで引きつけてスプレー' : '威嚇している！ ぶつかる前に防御姿勢（E）', 'hint', 0.5, 2, backing);
+    else if (focus?.state === 'alert') this.say(backing ? '目を逸らさずにゆっくり後ずさり中…' : 'クマがこちらを見ている。走らず、目を離さずにゆっくり後退（S）', backing ? 'good' : 'hint', 0.5, 2, true);
     else if (focus?.state === 'stunned') this.say('クマがひるんでいる。今のうちに、ゆっくりその場を離れる', 'good', 0.5, 2);
     else if (nearest < 16) this.say('クマはまだ気づいていない。静かに、距離をとって進もう', 'hint', 0.5, 1);
     else if (this.T > this.msg.until) this.say('避難小屋を目指せ。クマに出会っても、走らない', 'hint', 0.5, 0);
 
     /* --- meters, heartbeat, danger --- */
     const al = focus ? focus.alert : 0, ch = focus ? focus.chase : 0;
-    (this.$('#alertbar').firstElementChild as HTMLElement).style.width = clamp(al, 0, 100) + '%';
+    this.$('#alertbar').style.setProperty('--alert-level', String(clamp(al, 0, 100)));
     (this.$('#chasebar').firstElementChild as HTMLElement).style.width = clamp(ch, 0, 100) + '%';
     const sl = this.$('#stateLab'), st = focus ? focus.state : null;
     sl.textContent = st ? LABEL[st] : '—'; sl.className = 'state st-' + (st ?? 'none');
@@ -769,7 +777,7 @@ export class Game3D {
   /** Bears that hear the bell / radio from far enough away usually move off before they see you. */
   private scareByTools(bell: boolean) {
     for (const b of this.bears) {
-      if (b.cub || b.heardBell || b.state !== 'patrol') continue;
+      if (b.cub || b.isMother || b.heardBell || b.state !== 'patrol') continue;
       const d = Math.hypot(b.x - this.px, b.z - this.pz);
       if (d > (bell ? 26 : 22) || d < 11) continue;
       b.heardBell = true;
@@ -892,7 +900,7 @@ export class Game3D {
     if (b.state === 'chase') return;
     b.state = 'chase'; b.chase = 100;
     this.snd.roar(b); this.flash('#ff2a1a', 0.3); this.shake = 0.6;
-    this.fx?.callout('突進！', 'warn');
+    this.fx?.callout('突進！', 'danger');
     this.say('走るな！ 背中を見せたので突進してきた！', 'bad', 1.6, 5);
   }
 
@@ -945,11 +953,23 @@ export class Game3D {
     });
     r.eyeMat.emissive.setHex(b.state === 'chase' || b.state === 'threaten' ? 0xff2a1a : 0xe2bc72);
     r.eyeMat.emissiveIntensity = b.state === 'chase' || b.state === 'threaten' ? 4.5 : 2.2;
-    /* gaze cone (hidden from Lv.3) and the "?" / "!" badge */
+    /* Ground guide (hidden from Lv.3) and the "?" / "!" badge. */
     const cd = Math.hypot(b.x - this.px, b.z - this.pz);
     r.cone.visible = !b.cub && this.setup.level < NOLANE_LV && (b.state === 'patrol' || b.state === 'alert') && cd < 28;
     r.coneMat.color.setHex(b.state === 'alert' ? 0xff8a3d : 0xf0c86e);
-    r.coneMat.opacity = b.state === 'alert' ? 0.13 : 0.07;
+    r.coneMat.opacity = b.state === 'alert' ? 0.32 : 0.18;
+    if (r.cone.visible) {
+      const vertices = r.cone.geometry.getAttribute('position');
+      const scale = r.root.scale.x, range = this.sightR / 12.5;
+      const sin = Math.sin(b.dir), cos = Math.cos(b.dir);
+      r.cone.scale.set(range, 1, range);
+      for (let i = 0; i < vertices.count; i++) {
+        const x = vertices.getX(i) * scale * range, z = vertices.getZ(i) * scale * range;
+        const y = groundY(b.x + cos * x + sin * z, b.z - sin * x + cos * z);
+        vertices.setY(i, (y - r.root.position.y + 0.08) / scale);
+      }
+      vertices.needsUpdate = true;
+    }
     const ic = (ICONS as Record<string, THREE.Texture>)[b.state];
     r.icon.visible = !!ic && !b.cub;
     if (ic && r.icon.material.map !== ic) { r.icon.material.map = ic; r.icon.material.needsUpdate = true; }
@@ -1097,7 +1117,7 @@ export class Game3D {
     const o = this.outcome(win);
     if (win) {
       this.snd.win();
-      this.say('避難小屋に着いた！', 'good', 5, 9);
+      this.say('避難小屋に着いた！', 'arrival', 5, 9);
       const sub = { rainbow: '一度も気づかれずに抜けた', gold: '正しい行動だけで抜けた', silver: '生還。次はもっと落ち着いて' }[o.tier!];
       this.later(() => this.fx!.reveal(o.tier!, undefined, undefined, sub).then(() => this.hooks.onDone(o)), 600);
       return;

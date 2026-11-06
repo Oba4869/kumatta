@@ -165,7 +165,7 @@ export function signTexture(text: string) {
   x.fillStyle = '#6a4c35'; x.fillRect(0, 0, 256, 96);
   for (let i = 0; i < 40; i++) { x.strokeStyle = 'rgba(30,20,10,.35)'; x.lineWidth = 1; x.beginPath(); const y = Math.random() * 96; x.moveTo(0, y); x.lineTo(256, y + rnd(-3, 3)); x.stroke(); }
   x.strokeStyle = '#2a1c10'; x.lineWidth = 6; x.strokeRect(3, 3, 250, 90);
-  x.fillStyle = '#f3e6c8'; x.font = '800 44px "Shippori Mincho B1",serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = '#fff'; x.font = '900 44px "Zen Kaku Gothic New",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
   x.fillText(text, 128, 50);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }
@@ -175,7 +175,7 @@ export function iconTexture(txt: string, bg: string, fg: string) {
   const [c, x] = canvas(128);
   x.beginPath(); x.arc(64, 64, 52, 0, 7); x.fillStyle = bg; x.fill();
   x.lineWidth = 6; x.strokeStyle = '#e2bc72'; x.stroke();
-  x.fillStyle = fg; x.font = '900 70px "Shippori Mincho B1",serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
+  x.fillStyle = fg; x.font = '900 70px "Zen Kaku Gothic New",sans-serif'; x.textAlign = 'center'; x.textBaseline = 'middle';
   x.fillText(txt, 64, 70);
   const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
 }

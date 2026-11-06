@@ -12,6 +12,8 @@ export interface Profile {
   sprayHits: number;
   scared: number;
   dex: Record<string, boolean>;
+  unreadDex: string[];
+  unreadBadges: string[];
   /** mountains since the last snow map */
   sinceSnow: number;
 }
@@ -20,7 +22,7 @@ export interface Profile {
 const KEY = 'bearReflex.v1';
 
 export const blankProfile = (): Profile => ({
-  runs: 0, xp: 0, best: null, streak: 0, sStreak: 0, badges: {}, conds: {}, tools: {}, sprayHits: 0, scared: 0, dex: {}, sinceSnow: 0,
+  runs: 0, xp: 0, best: null, streak: 0, sStreak: 0, badges: {}, conds: {}, tools: {}, sprayHits: 0, scared: 0, dex: {}, unreadDex: [], unreadBadges: [], sinceSnow: 0,
 });
 
 export const loadProfile = (): Profile => {

@@ -50,12 +50,14 @@ export default function StageSelectScreen() {
         </button>
 
         <article className="stage-card" key={cond.id} aria-live="polite">
-          <StageArt id={cond.id} className="stage-art" />
-          <div className="stage-top">
-            <h2>{cond.name}</h2>
-            <span className="stage-diff" aria-label={'難易度 4段階中' + cond.diff}>難易度 {diffStars(cond.diff)}</span>
+          <div className="stage-preview">
+            <StageArt id={cond.id} className="stage-art" animated />
+            <div className="stage-top">
+              <h2>{cond.name}</h2>
+              <span className="stage-diff" aria-label={'難易度 4段階中' + cond.diff}>難易度 <span className="stage-stars" aria-hidden="true">{diffStars(cond.diff)}</span></span>
+            </div>
+            <p className="stage-desc">{cond.desc}</p>
           </div>
-          <p className="stage-desc">{cond.desc}</p>
         </article>
 
         <button className="arrow" type="button" aria-label="次の山" onClick={() => move(1)}>

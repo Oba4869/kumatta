@@ -15,7 +15,7 @@ export const audio = (): AudioContext | null => {
       const Ctx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       ac = new Ctx();
     }
-    if (ac.state === 'suspended') void ac.resume();
+    if (ac.state !== 'running' && ac.state !== 'closed') void ac.resume().catch(() => {});
     return ac;
   } catch {
     return null;

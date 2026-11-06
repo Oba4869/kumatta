@@ -48,7 +48,7 @@ export default function PlayScreen({ setup, onDone, onQuit }: Props) {
             <div className="row"><span className="lab">クマの警戒・興奮度</span><div className="bar" id="alertbar"><i /></div><span className="state st-none" id="stateLab">—</span></div>
             <div className="row"><span className="lab">追撃ゲージ</span><div className="bar" id="chasebar"><i /></div><span className="state dist" id="distLab">小屋まで —</span></div>
           </div>
-          <div className="g3-map"><canvas id="minimap" aria-label="周辺マップ（上が向いている方向）" /><span>マップ</span></div>
+          <div className="g3-map"><canvas id="minimap" aria-label="周辺マップ（上が向いている方向）" /></div>
           <div className="g3-compass g3-panel" id="compass"><i>▲</i><span>避難小屋</span></div>
           <div className="g3-wind g3-panel" id="swind" hidden><i>▲</i><span>風</span></div>
           <div id="advice" className="hint" aria-live="polite">避難小屋を目指せ</div>

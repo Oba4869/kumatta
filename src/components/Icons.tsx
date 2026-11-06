@@ -77,7 +77,10 @@ export const CheckIcon = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
 );
 
-/** Bear medal: a big bear face with eyes and muzzle cut out. */
-export const MedalIcon = () => (
-  <svg width="30" height="30" viewBox="0 0 24 24" aria-hidden="true"><g transform="translate(0 -1)"><circle cx="5.6" cy="6.4" r="3.4" fill="currentColor"/><circle cx="18.4" cy="6.4" r="3.4" fill="currentColor"/><path fill="currentColor" fillRule="evenodd" d="M3.5 13.5a8.5 8.5 0 1 0 17 0a8.5 8.5 0 1 0 -17 0Z M7.8 11.6a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0Z M13.6 11.6a1.3 1.3 0 1 0 2.6 0a1.3 1.3 0 1 0 -2.6 0Z M8.7 16.2a3.3 2.5 0 1 0 6.6 0a3.3 2.5 0 1 0 -6.6 0Z"/><circle cx="12" cy="15.5" r="1.15" fill="currentColor"/></g></svg>
-);
+const badgeImages = import.meta.glob(['../assets/badge-icons/*.png', '!../assets/badge-icons/badge-sheet.png'], {
+  eager: true, query: '?url', import: 'default',
+}) as Record<string, string>;
+
+export function BadgeIcon({ id, locked = false }: { id: string; locked?: boolean }) {
+  return <img className={'badge-icon' + (locked ? ' locked' : '')} src={badgeImages['../assets/badge-icons/' + id + '.png']} width="32" height="32" alt="" />;
+}

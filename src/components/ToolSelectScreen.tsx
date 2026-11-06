@@ -42,11 +42,11 @@ export default function ToolSelectScreen() {
   };
 
   const ready = picked.length >= MAX_TOOLS;
-  const sub = full && ready ? '持てるのは' + MAX_TOOLS + 'つまで。' : MAX_TOOLS + 'つまで選択。';
+  const limitReached = full && ready;
 
   return (
     <main className="scr scr-tools">
-      <StageArt id={base.id} className="scr-bg blurred" />
+      <StageArt id={base.id} className="scr-bg blurred" animated />
       <div className="scr-shade" />
 
       <header className="scr-head">
@@ -58,7 +58,14 @@ export default function ToolSelectScreen() {
       </header>
 
       <div className="tools-body">
-        <p className={'scr-sub' + (full ? ' warn' : '')} aria-live="polite">{sub}</p>
+        <p className="scr-sub" aria-live="polite">
+          {limitReached ? `持てるのは${MAX_TOOLS}つまで。` : (
+            <>
+              <span className="tool-limit">{MAX_TOOLS}つ</span>
+              <span className="tool-limit-caption">まで選択</span>
+            </>
+          )}
+        </p>
 
         <div className="mtools" role="group" aria-labelledby="toolsTitle">
           {offer.map((k) => {
@@ -81,7 +88,12 @@ export default function ToolSelectScreen() {
           })}
         </div>
 
-        <p className="tool-desc" aria-live="polite">{info ? TOOLS[info].eff + '。' + TOOLS[info].desc : ' '}</p>
+        <div className="tool-desc-slot">
+          {offer.map((k) => (
+            <p key={k} className="tool-desc tool-desc-measure" aria-hidden="true">{TOOLS[k].eff + '。' + TOOLS[k].desc}</p>
+          ))}
+          <p className="tool-desc" aria-live="polite">{info ? TOOLS[info].eff + '。' + TOOLS[info].desc : ''}</p>
+        </div>
       </div>
 
       <footer className="scr-foot">

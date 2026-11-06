@@ -247,12 +247,17 @@ export function makeBear(kind: BearKind, cub = false, lite = false): BearRig {
   mkLeg(root, -0.37, 0.92, -0.55, true);
   mkLeg(root, 0.37, 0.92, -0.55, true);
 
-  /* a faint gaze cone on the ground (Identity V's hunter sight) */
-  const coneMat = new THREE.MeshBasicMaterial({ color: 0xf0c86e, transparent: true, opacity: 0.08, depthWrite: false, side: THREE.DoubleSide });
-  const half = 0.95, R = 12.5 / S;
-  const cone = new THREE.Mesh(new THREE.CircleGeometry(R, 32, -Math.PI / 2 - half, half * 2), coneMat);
-  cone.rotation.x = -Math.PI / 2; cone.position.y = 0.06 / S;
-  cone.visible = !cub;
+  /* A subdivided ground guide whose heights follow the terrain during play. */
+  const coneMat = new THREE.MeshBasicMaterial({ color: 0xf0c86e, transparent: true, opacity: 0.18, depthWrite: false, side: THREE.DoubleSide });
+  const lane = new THREE.PlaneGeometry(2, 1, 10, 10);
+  const vertices = lane.getAttribute('position');
+  for (let i = 0; i < vertices.count; i++) {
+    const along = vertices.getY(i) + 0.5;
+    vertices.setXYZ(i, vertices.getX(i) * (0.45 + along * 9.7) / S, 0, (0.35 + along * 11.9) / S);
+  }
+  const cone = new THREE.Mesh(lane, coneMat);
+  cone.visible = false;
+  cone.frustumCulled = false;
   root.add(cone);
 
   const icon = new THREE.Sprite(new THREE.SpriteMaterial({ map: ICONS.alert, depthTest: false, transparent: true, fog: false }));

@@ -138,7 +138,7 @@ export class SwipePad {
   }
 
   /** Big game-style call-out across the screen. */
-  callout(text: string, kind: 'go' | 'warn' | 'ok' = 'go') {
+  callout(text: string, kind: 'go' | 'warn' | 'danger' | 'ok' = 'go') {
     const el = this.root.querySelector<HTMLElement>('#callout');
     if (!el) return;
     /* two stacked copies: a thick dark outline behind, the bright gradient letters in front */

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Navigate, Outlet, Route, Routes, useLocation, useNavigate } from 'react-router';
-import DexScreen from './components/DexScreen';
+import ProfileScreen from './components/ProfileScreen';
 import PlayScreen from './components/PlayScreen';
 import ResultScreen from './components/ResultScreen';
 import StageSelectScreen from './components/StageSelectScreen';
@@ -26,6 +26,9 @@ function Layout() {
 
   useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
 
+  if (pathname === '/dex') return <Outlet />;
+  if (pathname === '/result') return <div className="app"><Outlet /></div>;
+
   if (FULLSCREEN.includes(pathname)) {
     return (
       <>
@@ -43,7 +46,7 @@ function Layout() {
       <div className="top">
         <span className="brand">くまった</span>
         <div className="top-actions">
-          {pathname !== '/dex' && <button className="iconbtn" type="button" onClick={() => navigate('/dex')}>図鑑</button>}
+          <button className="iconbtn" type="button" onClick={() => navigate('/dex', { state: { fromMenu: true } })}>図鑑</button>
           <button className={'iconbtn snd' + (sound ? ' on' : '')} type="button" aria-pressed={sound} aria-label="効果音" title={sound ? '効果音：オン（押すとオフ）' : '効果音：オフ（押すとオン）'} onClick={toggleSound}>
             <SoundIcon on={sound} />
             <span className="snd-state" aria-hidden="true">{sound ? 'オン' : 'オフ'}</span>
@@ -83,15 +86,8 @@ function ResultRoute() {
       result={last.result}
       onAgain={startRun}
       onNext={() => navigate('/stages')}
-      onDex={() => navigate('/dex')}
     />
   );
-}
-
-function DexRoute() {
-  const { profile } = useGame();
-  const navigate = useNavigate();
-  return <DexScreen profile={profile} onBack={() => navigate(-1)} />;
 }
 
 export default function App() {
@@ -104,7 +100,7 @@ export default function App() {
           <Route path="tools" element={<ToolsRoute />} />
           <Route path="play" element={<PlayRoute />} />
           <Route path="result" element={<ResultRoute />} />
-          <Route path="dex" element={<DexRoute />} />
+          <Route path="dex" element={<ProfileScreen />} />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Route>
       </Routes>
