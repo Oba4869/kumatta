@@ -47,7 +47,7 @@ export default function ToolSelectScreen() {
 
   return (
     <main className="scr scr-tools">
-      <StageArt id={base.id} className="scr-bg blurred" />
+      <StageArt id={base.id} className="scr-bg blurred" animated />
       <div className="scr-shade" />
 
       <header className="scr-head">
@@ -82,7 +82,13 @@ export default function ToolSelectScreen() {
           })}
         </div>
 
-        <p className="tool-desc" aria-live="polite">{info ? TOOLS[info].eff + '。' + TOOLS[info].desc : ' '}</p>
+        {/* every description is laid out (hidden) in the same spot, so the slot is as tall as the longest and nothing jumps when the text changes */}
+        <div className="tool-desc-slot">
+          {offer.map((k) => (
+            <p key={k} className="tool-desc tool-desc-measure" aria-hidden="true">{TOOLS[k].eff + '。' + TOOLS[k].desc}</p>
+          ))}
+          <p className="tool-desc" aria-live="polite">{info ? TOOLS[info].eff + '。' + TOOLS[info].desc : ''}</p>
+        </div>
       </div>
 
       <footer className="scr-foot">

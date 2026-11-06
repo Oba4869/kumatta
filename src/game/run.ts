@@ -35,7 +35,9 @@ export const drawRun = (p: Profile, prev: Condition['id'] | null): { setup: RunS
   const base = snowNow ? CONDS.find((c) => c.id === 'hokkaido')! : pool[Math.floor(Math.random() * pool.length)];
   const nOffer = lvInfo(p.xp).l >= FOURTOOLS_LV ? 4 : 3;
   const offer = shuffle(TOOL_IDS).slice(0, nOffer);
-  const wxPool = base.wxs ? base.wxs.filter((w) => (snowNow ? w.id === 'snow' : w.id !== 'snow')) : null;
+  /* Hokkaido has only the snow weather now, so fall back to the whole list when the filter leaves nothing */
+  const picked = base.wxs?.filter((w) => (snowNow ? w.id === 'snow' : w.id !== 'snow'));
+  const wxPool = base.wxs ? (picked?.length ? picked : base.wxs) : null;
   const wx = wxPool ? wxPool[Math.floor(Math.random() * wxPool.length)] : null;
   return { setup: { base, wx, offer }, profile: { ...p, sinceSnow } };
 };

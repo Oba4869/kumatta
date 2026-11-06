@@ -23,7 +23,7 @@ const PAL: Record<Id, Pal> = {
 };
 
 const ALT: Record<Id, string> = {
-  calm: '月明かりの下、道の先に避難小屋の明かりが見える夜の山道',
+  calm: '月明かりに照らされた、静かな夜の山道',
   stream: '沢が流れ、広葉樹が立ち並ぶ夜の山道',
   dusk: '夕日が山並みに沈む薄暗い山道',
   wind: '強風で木々が傾き、葉が舞う山道',
@@ -106,7 +106,7 @@ const cap = (x: number, y: number, w: number) =>
   `M${x} ${y}L${x - w} ${y + w * 1.3}L${x - w * 0.4} ${y + w * 1.05}L${x} ${y + w * 1.5}L${x + w * 0.4} ${y + w * 1.05}L${x + w} ${y + w * 1.3}Z`;
 
 /** Illustration for one mountain. Drawn in SVG so no image files are needed; swap for artwork any time. */
-export default function StageArt({ id, className }: { id: Id; className?: string }) {
+export default function StageArt({ id, className, animated = false }: { id: Id; className?: string; animated?: boolean }) {
   const p = PAL[id];
   const sky = `sa-sky-${id}`;
   const blur = `sa-blur-${id}`;
@@ -118,7 +118,7 @@ export default function StageArt({ id, className }: { id: Id; className?: string
   const nearT = lean ? 'translate(28 0) skewX(-10)' : undefined;
 
   return (
-    <svg className={className} viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" role="img" aria-label={ALT[id]}>
+    <svg className={animated ? `${className ?? ''} stage-motion` : className} viewBox="0 0 320 180" preserveAspectRatio="xMidYMid slice" role="img" aria-label={ALT[id]}>
       <defs>
         <linearGradient id={sky} x1="0" y1="0" x2="0" y2="1">
           {p.sky.map((c, i) => <stop key={c} offset={i / (p.sky.length - 1)} stopColor={c} />)}
@@ -130,7 +130,11 @@ export default function StageArt({ id, className }: { id: Id; className?: string
 
       <rect width="320" height="180" fill={`url(#${sky})`} />
 
-      {(id === 'calm' || id === 'stream' || id === 'hokkaido') && STARS.map(([x, y]) => <circle key={x} cx={x} cy={y} r="0.9" fill="#fff" opacity=".8" />)}
+      {(id === 'calm' || id === 'stream' || id === 'hokkaido') && (
+        <g className={id === 'hokkaido' ? undefined : 'stage-twinkle'}>
+          {STARS.map(([x, y]) => <circle key={x} cx={x} cy={y} r="0.9" fill="#fff" opacity=".8" />)}
+        </g>
+      )}
 
       {/* sun or moon */}
       {id === 'dusk' && (
@@ -164,7 +168,7 @@ export default function StageArt({ id, className }: { id: Id; className?: string
       )}
 
       {id === 'dusk' && (
-        <g stroke="#2a1630" strokeWidth="1.1" fill="none" strokeLinecap="round">
+        <g className="stage-crows" stroke="#2a1630" strokeWidth="1.1" fill="none" strokeLinecap="round">
           <path d="M196 38q4-5 8 0q4-5 8 0" />
           <path d="M224 52q3-4 6 0q3-4 6 0" />
           <path d="M176 56q3-4 6 0q3-4 6 0" />
@@ -189,15 +193,6 @@ export default function StageArt({ id, className }: { id: Id; className?: string
       </g>
       {isFog && <ellipse cx="160" cy="112" rx="200" ry="16" fill="#e4eaec" opacity=".55" filter={`url(#${blur})`} />}
 
-      {/* the lit refuge hut at the end of the trail */}
-      {id === 'calm' && (
-        <g transform="translate(46 0)">
-          <circle cx="57" cy="126" r="16" fill="#ffb238" opacity=".35" filter={`url(#${blur})`} />
-          <rect x="47" y="122" width="22" height="13" fill="#0b1630" />
-          <path d="M44 122L58 110L72 122Z" fill="#0b1630" />
-          <rect x="53" y="125" width="7" height="7" fill="#ffcf6b" />
-        </g>
-      )}
 
       <g transform={lean ? 'translate(20 0) skewX(-8)' : undefined} opacity={isFog ? 0.82 : 1}>
         <path d={id === 'stream' ? ROUND : MID} fill={p.mid} />
@@ -207,25 +202,20 @@ export default function StageArt({ id, className }: { id: Id; className?: string
       <path d="M0 140Q160 128 320 140V180H0Z" fill={p.ground} />
       <path d="M118 180Q150 152 168 138L184 138Q188 158 232 180Z" fill={p.trail} />
 
+
       {id === 'stream' && (
         <g>
           <path d="M0 154Q70 142 150 156T320 148V176Q240 184 150 174T0 172Z" fill="#3a8294" />
           <path d="M0 154Q70 142 150 156T320 148" stroke="#c6f0f6" strokeWidth="1.2" fill="none" opacity=".8" />
-          <path d="M24 162q22-4 44 0M110 168q22-4 44 0M214 160q22-4 44 0M70 172q18-3 36 0" stroke="#d8f8fb" strokeWidth="1" fill="none" strokeLinecap="round" opacity=".75" />
+          <path className="stage-ripples" d="M24 162q22-4 44 0M110 168q22-4 44 0M214 160q22-4 44 0M70 172q18-3 36 0" stroke="#d8f8fb" strokeWidth="1" fill="none" strokeLinecap="round" opacity=".75" />
           <ellipse cx="252" cy="154" rx="9" ry="3.4" fill="#0a2229" />
           <ellipse cx="38" cy="160" rx="7" ry="3" fill="#0a2229" />
           <ellipse cx="146" cy="175" rx="10" ry="3.4" fill="#0a2229" />
         </g>
       )}
 
-      {id === 'dusk' && <rect y="136" width="320" height="6" fill="#ff9a5c" opacity=".25" filter={`url(#${blur})`} />}
+      {id === 'dusk' && <rect className="stage-dusk-light" y="136" width="320" height="6" fill="#ff9a5c" opacity=".25" filter={`url(#${blur})`} />}
 
-      {/* the bear, only its eyes */}
-      <g opacity={isFog ? 0.7 : 1}>
-        <circle cx="212" cy="121" r="7" fill="#ffb238" opacity=".35" filter={`url(#${blur})`} />
-        <ellipse cx="209" cy="121" rx="1.7" ry="1.4" fill="#ffc35a" />
-        <ellipse cx="215" cy="121" rx="1.7" ry="1.4" fill="#ffc35a" />
-      </g>
 
       <g transform={nearT}>
         <path d={NEAR} fill={p.near} />
@@ -234,12 +224,12 @@ export default function StageArt({ id, className }: { id: Id; className?: string
 
       {id === 'calm' && FIREFLIES.map(([x, y], i) => (
         <circle key={x} cx={x} cy={y} r="1.2" fill="#d9ff8a">
-          <animate attributeName="opacity" values="0.2;1;0.2" dur={`${2.4 + i * 0.5}s`} repeatCount="indefinite" />
+          <animate attributeName="opacity" values="0.2;1;0.2" dur={`${(2.4 + i * 0.5) / (animated ? 2 : 1)}s`} repeatCount="indefinite" />
         </circle>
       ))}
 
       {lean && (
-        <g>
+        <g className="stage-wind">
           <g stroke="#e3edf5" strokeWidth="1" fill="none" strokeLinecap="round" opacity=".45">
             <path d="M14 52q30-8 60 0t60 0" />
             <path d="M120 82q30-8 60 0t60 0" />
@@ -251,14 +241,18 @@ export default function StageArt({ id, className }: { id: Id; className?: string
       )}
 
       {isFog && (
-        <g fill="#eef2f3" filter={`url(#${blur})`}>
+        <g className="stage-fog" fill="#eef2f3" filter={`url(#${blur})`}>
           <ellipse cx="80" cy="150" rx="150" ry="20" opacity=".5" />
           <ellipse cx="250" cy="132" rx="130" ry="16" opacity=".42" />
           <ellipse cx="160" cy="172" rx="200" ry="14" opacity=".5" />
         </g>
       )}
 
-      {id === 'hokkaido' && FLAKES.map((f, i) => <circle key={i} cx={f.x} cy={f.y} r={f.r} fill="#fff" opacity=".88" />)}
+      {id === 'hokkaido' && (
+        <g className="stage-snow">
+          {FLAKES.map((f, i) => <circle key={i} cx={f.x} cy={f.y} r={f.r} fill="#fff" opacity=".88" />)}
+        </g>
+      )}
     </svg>
   );
 }

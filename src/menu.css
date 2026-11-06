@@ -174,3 +174,66 @@
   .scr-foot{padding-top:6px}
   .scr-stage .mbtn.go,.mbtn.go{min-height:46px;font-size:17px;min-width:200px}
 }
+
+/* ---------- the stage pictures move a little (from 小林さん's screen PR) ---------- */
+/* small, slow ambient loops: kept even when the OS asks for less motion (they don't move the layout) */
+@media all{
+  .stage-motion .stage-ripples{animation:stageDrift 1.5s ease-in-out infinite alternate;--drift-x:7px}
+  .stage-motion .stage-wind{animation:stageDrift .85s ease-in-out infinite alternate;--drift-x:14px}
+  .stage-motion .stage-fog{animation:stageDrift 4s ease-in-out infinite alternate;--drift-x:20px}
+  .stage-motion .stage-dusk-light{animation:stageDuskLight 2.5s ease-in-out infinite alternate}
+  .stage-motion .stage-crows{animation:stageCrowGlide 5s ease-in-out infinite alternate}
+  .stage-motion .stage-crows path{transform-box:fill-box;transform-origin:center bottom;animation:stageCrowFlap .6s ease-in-out infinite alternate}
+  .stage-motion .stage-crows path:nth-child(2){animation-delay:-.2s}
+  .stage-motion .stage-crows path:nth-child(3){animation-delay:-.4s}
+  .stage-motion .stage-twinkle circle{animation:stageTwinkle 1.3s ease-in-out infinite alternate}
+  .stage-motion .stage-twinkle circle:nth-child(3n + 1){animation-delay:-.4s}
+  .stage-motion .stage-twinkle circle:nth-child(3n + 2){animation-delay:-.85s}
+  .stage-motion .stage-snow circle{animation:stageSnow 3s linear infinite}
+  .stage-motion .stage-snow circle:nth-child(3n + 1){animation-delay:-1s}
+  .stage-motion .stage-snow circle:nth-child(3n + 2){animation-delay:-2s}
+}
+@keyframes stageDrift{to{transform:translateX(var(--drift-x))}}
+@keyframes stageDuskLight{to{opacity:.45}}
+@keyframes stageCrowGlide{to{transform:translate(12px,-5px)}}
+@keyframes stageCrowFlap{to{transform:scaleY(.25)}}
+@keyframes stageTwinkle{from{opacity:.2}to{opacity:1}}
+@keyframes stageSnow{0%{opacity:0}15%,80%{opacity:.88}100%{opacity:0;transform:translate(5px,18px)}}
+.scr-bg.stage-motion{animation:stageIn .28s ease-out both}
+@media (prefers-reduced-motion:reduce){.scr-bg.stage-motion{animation:none}}
+
+/* tool descriptions: the hidden copies keep the slot as tall as the longest one */
+.tool-desc-slot{display:grid;width:100%;justify-items:center}
+.tool-desc-slot .tool-desc{grid-area:1/1;min-height:0}
+.tool-desc-measure{visibility:hidden}
+
+/* ---------- stage select: 小林さん's frame (thin white lines, corner brackets, a soft glow) ----------
+   The type stays the game's own; only the frame, the arrows, the dots and the buttons take the new look. */
+.scr-stage .stage-card{--stage-preview-gap:clamp(9px,1.35vw,19px);border:0;border-radius:0;background:transparent;box-shadow:none;overflow:visible}
+.stage-preview{position:absolute;inset:var(--stage-preview-gap);overflow:hidden;border-radius:0;background:#0a0e18;box-shadow:0 14px 56px rgba(0,0,0,.65)}
+.scr-stage .stage-card::after{--corner-length:clamp(18px,2.9vw,40px);--corner-width:2px;content:"";position:absolute;inset:3px;pointer-events:none;
+  background:
+    linear-gradient(#fff 0 0) left top/var(--corner-length) var(--corner-width),
+    linear-gradient(#fff 0 0) left top/var(--corner-width) var(--corner-length),
+    linear-gradient(#fff 0 0) right top/var(--corner-length) var(--corner-width),
+    linear-gradient(#fff 0 0) right top/var(--corner-width) var(--corner-length),
+    linear-gradient(#fff 0 0) left bottom/var(--corner-length) var(--corner-width),
+    linear-gradient(#fff 0 0) left bottom/var(--corner-width) var(--corner-length),
+    linear-gradient(#fff 0 0) right bottom/var(--corner-length) var(--corner-width),
+    linear-gradient(#fff 0 0) right bottom/var(--corner-width) var(--corner-length);
+  background-repeat:no-repeat;filter:drop-shadow(0 0 4px #fff9)}
+.scr-stage .stage-top h2{position:relative}
+.scr-stage .stage-top h2::after{content:"";position:absolute;inset:auto auto -4px 0;width:2.4em;height:2px;background:#e8f5ff;transform:skewX(-24deg);box-shadow:0 0 5px #e8f5ffb0;pointer-events:none}
+.scr-stage .arrow svg{width:70%;height:70%;filter:drop-shadow(0 0 3px #fff) drop-shadow(0 0 4px #fff8);stroke:none}
+.scr-stage .dots button{border-radius:2px;box-shadow:0 0 4px #fff7}
+.scr-stage .dots button.on{box-shadow:0 0 3px #fff,0 0 7px #fff8}
+.scr-stage :is(.scr-back,.mbtn.go){border-radius:0;background:rgb(0 0 0 / 32%);-webkit-backdrop-filter:none;backdrop-filter:none;box-shadow:0 0 4px #fff9,0 0 9px #fff6}
+.scr-stage .mbtn.go:hover{background:rgb(0 0 0 / 42%);border-color:#fff}
+.scr-stage .mbtn.go svg{color:#ff901f;filter:drop-shadow(0 0 3px #ff901f) drop-shadow(0 0 7px #ff6d19aa)}
+@media (orientation:landscape) and (max-height:520px){.scr-stage .stage-card{--stage-preview-gap:7px}.scr-stage .stage-card::after{--corner-length:22px}}
+
+/* 小林さん's small motions: the card slides in quickly, the dots grow and glow as you move */
+.scr-stage .stage-card{animation-duration:.14s}
+.scr-stage .dots button{transition:transform .18s ease-out,box-shadow .18s ease-out,background-color .18s ease-out}
+.scr-stage .arrow{transition:transform .12s,filter .12s}
+@media (prefers-reduced-motion:reduce){.scr-stage .dots button,.scr-stage .arrow{transition:none}}

@@ -21,6 +21,7 @@ import { NOLANE_LV } from '../data/levels';
 import { SwipePad } from '../game/swipe';
 import type { Outcome, PlayCondition, Tier } from '../game/types';
 import { Audio3D } from './audio3d';
+import { audio } from '../lib/sound';
 import { ICONS, makeBear, makeCritter, makeHand, makeHiker, type BearKind, type BearRig, type CritterKind } from './actors';
 import { makePost } from './post';
 import { softDot } from './textures';
@@ -495,7 +496,7 @@ export class Game3D {
     hold(this.$('#tBack'), 'back'); hold(this.$('#tGuard'), 'guard');
     const openHelp = () => { if (this.state === 'end') return; this.$('#help').hidden = false; this.state = 'intro'; try { document.exitPointerLock(); } catch { /* ignore */ } };
     this.$('#helpBtn').addEventListener('click', (e) => { e.stopPropagation(); openHelp(); }, sig);
-    this.$('#helpOk').addEventListener('click', (e) => { e.stopPropagation(); this.$('#help').hidden = true; try { localStorage.setItem('bearReflex.help3d', '1'); } catch { /* ignore */ } if (this.state === 'intro') { this.state = 'play'; this.last = performance.now(); } }, sig);
+    this.$('#helpOk').addEventListener('click', (e) => { e.stopPropagation(); audio(); this.$('#help').hidden = true; try { localStorage.setItem('bearReflex.help3d', '1'); } catch { /* ignore */ } if (this.state === 'intro') { this.state = 'play'; this.last = performance.now(); } }, sig);
     this.$('#tSpray').addEventListener('pointerdown', (e) => { e.preventDefault(); this.useSpray(); }, sig);
     this.$('#viewBtn').addEventListener('click', (e) => { e.stopPropagation(); this.toggleView(); }, sig);
     this.$('#quit').addEventListener('click', () => this.hooks.onQuit?.(), sig);
