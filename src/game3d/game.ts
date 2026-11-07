@@ -742,7 +742,7 @@ export class Game3D {
     else if (running && nearest < 22) this.say('走ると足音で気づかれる。クマの近くでは走らない', 'bad', 0.8, 2);
     else if (focus?.state === 'chase') this.say(this.sprays ? '突進してくる！ 走っても逃げきれない — 引きつけてスプレー！' : '突進してくる！ 走っても逃げきれない', 'bad', 0.5, 3);
     else if (focus?.state === 'threaten') this.say(backing ? '目を逸らさずに後ずさり中… ' + (this.sprays ? '近づいてきたら引きつけてスプレー' : '迫ってきたら防御姿勢') : this.sprays ? '立ち上がって威嚇している！ 数メートルまで引きつけてスプレー' : '威嚇している！ ぶつかる前に防御姿勢（E）', 'hint', 0.5, 2);
-    else if (focus?.state === 'alert') this.say(backing ? '目を逸らさずにゆっくり後ずさり中…' : 'クマがこちらを見ている。走らず、目を離さずにゆっくり後退（S）', backing ? 'good' : 'hint', 0.5, 2);
+    else if (focus?.state === 'alert') this.say(backing ? '目を逸らさずにゆっくり後ずさり中…' : (this.coarse ? 'クマがこちらを見ている。走らず、目を離さずに「後ずさり」を長押し' : 'クマがこちらを見ている。走らず、目を離さずにゆっくり後退（S）'), backing ? 'good' : 'hint', 0.5, 2);
     else if (focus?.state === 'stunned') this.say('クマがひるんでいる。今のうちに、ゆっくりその場を離れる', 'good', 0.5, 2);
     else if (nearest < 16) this.say('クマはまだ気づいていない。静かに、距離をとって進もう', 'hint', 0.5, 1);
     else if (this.T > this.msg.until) this.say('避難小屋を目指せ。クマに出会っても、走らない', 'hint', 0.5, 0);

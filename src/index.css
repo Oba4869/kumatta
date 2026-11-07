@@ -617,7 +617,7 @@ body:not(.fp) .g3-cross,body:not(.fp) .g3-beardir{display:none}
 .rules{list-style:none;margin:14px 0;display:grid;gap:6px;font-size:13px}
 .rules li{padding:7px 10px;border-left:3px solid var(--gold);background:rgba(226,188,114,.08);border-radius:0 8px 8px 0}
 .rules b{color:var(--gold);font-family:'Shippori Mincho B1',serif}
-.g3-help-ok{width:100%}
+.g3-help-ok{width:100%;position:sticky;bottom:0;z-index:1;box-shadow:0 -12px 18px 4px rgba(12,15,13,.92)}
 
 /* ===== phone held upright during a run: cover the game and ask to turn it (the game waits) ===== */
 .g3-rotate{display:none}
