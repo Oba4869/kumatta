@@ -5,7 +5,14 @@ import { dexEntry } from '../data/dex';
 import { REWARDS } from '../data/levels';
 import { SRC } from '../data/sources';
 import { TOOLS } from '../data/tools';
-import { buildFeedback, type FeedbackItem, type FeedbackKind } from '../game/feedback';
+import { buildFeedback, type FeedbackIllustration, type FeedbackItem, type FeedbackKind } from '../game/feedback';
+import cubApproach from '../assets/review-illustrations/cub-approach.webp';
+import fleeCharge from '../assets/review-illustrations/flee-charge.webp';
+import lookAway from '../assets/review-illustrations/look-away.webp';
+import protectionTooLate from '../assets/review-illustrations/protection-too-late.webp';
+import runInFront from '../assets/review-illustrations/run-in-front.webp';
+import sprayHeadwind from '../assets/review-illustrations/spray-headwind.webp';
+import sprayTooFar from '../assets/review-illustrations/spray-too-far.webp';
 import { RANK_LABEL, RANK_LINE, type RunResult } from '../game/scoring';
 import type { Outcome, Tier } from '../game/types';
 import { sfx } from '../lib/sound';
@@ -34,9 +41,20 @@ const FB_ICON: Record<FeedbackKind, React.ReactNode> = {
   info: <path d="M12 11v6M12 7h.01" />,
 };
 
-function FeedbackCard({ item }: { item: FeedbackItem }) {
+/** A line drawing of the mistake, beside each "見直したい行動" (drawn by 小林さん, recoloured to the game's cream and gold). */
+const FB_ILLUSTRATION: Record<FeedbackIllustration, string> = {
+  'cub-approach': cubApproach,
+  'look-away': lookAway,
+  'run-in-front': runInFront,
+  'spray-headwind': sprayHeadwind,
+  'spray-too-far': sprayTooFar,
+  'protection-too-late': protectionTooLate,
+  'flee-charge': fleeCharge,
+};
+
+function FeedbackCard({ item, open = false }: { item: FeedbackItem; open?: boolean }) {
   return (
-    <details className={'item ' + item.kind} open={item.kind === 'bad'}>
+    <details className={'item ' + item.kind} open={open}>
       <summary>
         <span className="ic">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">{FB_ICON[item.kind]}</svg>
@@ -44,6 +62,7 @@ function FeedbackCard({ item }: { item: FeedbackItem }) {
         <h3>{item.title}</h3>
       </summary>
       <div className="body">
+        {item.kind === 'bad' && <img className="rs-illustration" src={FB_ILLUSTRATION[item.illustration]} alt="" width="720" height="480" loading="lazy" />}
         <p>{item.text}</p>
         {item.src && <cite>出典：{SRC[item.src]}</cite>}
       </div>
@@ -139,57 +158,48 @@ export default function ResultScreen({ outcome: o, result: r, onAgain, onNext }:
   let delay = 0.3;
   const nextDelay = () => { const d = delay; delay += 0.15; return d + 's'; };
 
-  return (
-    <section className="panel result">
-      <div className="rs-main">
-        <article className={'rank rs-verdict report r-' + r.rank} aria-labelledby="rsTitle">
-          <div className="confetti" ref={box} aria-hidden="true" />
-          <div className="permit-band">
-            <span className="permit-title">下山報告</span>
-            {o.tier && <span className={'rs-tier ' + o.tier}>{TIER_CHIP[o.tier]}</span>}
-          </div>
-          <header className="rs-vhead">
-            <span className="rs-cond">{condLine}</span>
-          </header>
-          <div className="rs-vbody">
-            <RankEmblem rank={r.rank} stamp={!reduce()} />
-            <div className="rs-vtext">
-              <p className="rs-cap">くまった判定</p>
-              <h2 id="rsTitle">{RANK_LABEL[r.rank]}</h2>
-              <p className="rs-line">{o.escaped ? ESC_LINE[r.rank] : RANK_LINE[r.rank]}</p>
-            </div>
-          </div>
-          <ol className={'missions' + (allClear ? ' all' : '')} aria-label="今回の目標">
-            {missions.map((x, i) => (
-              <li key={x.label} className={x.ok ? 'ok' : 'ng'} style={{ animationDelay: 0.5 + i * 0.28 + 's' }}>
-                <span className="ms-mark" aria-hidden="true">{x.ok ? '済' : '×'}</span>
-                <span className="ms-label">{x.label}</span>
-                <span className="sr-only">{x.ok ? '達成' : '未達成'}</span>
-              </li>
-            ))}
-            {allClear && <li className="ms-all" style={{ animationDelay: '1.45s' }}>3つすべて達成</li>}
-          </ol>
-          <dl className="rs-stats">
-            {o.escaped ? (
-              <div><dt>下山タイム</dt><dd>{o.time != null ? Math.round(o.time / 1000) + '秒' : '—'}</dd></div>
-            ) : (
-              <div><dt>反応時間</dt><dd>{o.reaction != null ? (o.reaction / 1000).toFixed(2) + '秒' : '—'}{r.newRec && <span className="newrec">ベスト</span>}</dd></div>
-            )}
-            <div><dt>判断</dt><dd>{move}</dd></div>
-            <div><dt>やり過ごした</dt><dd>{o.stops} / {o.rustles}</dd></div>
-          </dl>
-          <p className="rs-meta">
-            {bearLine}持ち物：{names}
-            {p.best != null && !r.newRec ? '　｜　自己ベスト ' + (p.best / 1000).toFixed(2) + '秒' : ''}
-          </p>
-        </article>
+  /* the first thing to fix is shown open with its drawing; the rest fold */
+  const firstBad = badItems[0]?.title;
 
+  return (
+    <section className={'panel result rs-card r-' + r.rank} aria-labelledby="rsTitle">
+      <div className="confetti" ref={box} aria-hidden="true" />
+
+      {/* ---- top: the verdict ---- */}
+      <header className="rs-card-top">
+        <div className="permit-band">
+          <span className="permit-title">下山報告</span>
+          {o.tier && <span className={'rs-tier ' + o.tier}>{TIER_CHIP[o.tier]}</span>}
+        </div>
+        <p className="rs-cond">{condLine}</p>
+        <div className="rs-vbody">
+          <RankEmblem rank={r.rank} stamp={!reduce()} />
+          <div className="rs-vtext">
+            <p className="rs-cap">くまった判定</p>
+            <h2 id="rsTitle">{RANK_LABEL[r.rank]}</h2>
+            <p className="rs-line">{o.escaped ? ESC_LINE[r.rank] : RANK_LINE[r.rank]}</p>
+          </div>
+        </div>
+        <ol className={'missions' + (allClear ? ' all' : '')} aria-label="今回の目標">
+          {missions.map((x, i) => (
+            <li key={x.label} className={x.ok ? 'ok' : 'ng'} style={{ animationDelay: 0.5 + i * 0.28 + 's' }}>
+              <span className="ms-mark" aria-hidden="true">{x.ok ? '済' : '×'}</span>
+              <span className="ms-label">{x.label}</span>
+              <span className="sr-only">{x.ok ? '達成' : '未達成'}</span>
+            </li>
+          ))}
+        </ol>
+        {allClear && <p className="ms-all" style={{ animationDelay: '1.45s' }}>3つすべて達成</p>}
+      </header>
+
+      {/* ---- middle: the review (left) and progress (right) ---- */}
+      <div className="rs-card-body">
         <section className="rs-review" aria-labelledby="rvTitle">
           <h3 className="rs-h" id="rvTitle">ふりかえり</h3>
           {badItems.length > 0 && (
             <div className="fb-group bad">
               <div className="rs-sub"><span>見直したい行動</span><span className="rs-n">{badItems.length}</span></div>
-              <div className="items">{badItems.map((it) => <FeedbackCard key={it.title} item={it} />)}</div>
+              <div className="items">{badItems.map((it) => <FeedbackCard key={it.title} item={it} open={it.title === firstBad} />)}</div>
             </div>
           )}
           {goodItems.length > 0 && (
@@ -203,72 +213,86 @@ export default function ResultScreen({ outcome: o, result: r, onAgain, onNext }:
             <div className="items">{infoItems.map((it) => <FeedbackCard key={it.title} item={it} />)}</div>
           </details>
         </section>
-      </div>
 
-      <aside className="rs-side">
-        <div className="startbar rs-actions">
-          <button className="btn btn-plain btn-again" type="button" onClick={onAgain}>同じ山でもう一度</button>
-          <button className="btn btn-primary btn-go" type="button" onClick={onNext}>次の山へ</button>
-        </div>
+        <aside className="rs-side">
+          <dl className="rs-stats">
+            {o.escaped ? (
+              <div><dt>下山タイム</dt><dd>{o.time != null ? Math.round(o.time / 1000) + '秒' : '—'}</dd></div>
+            ) : (
+              <div><dt>反応時間</dt><dd>{o.reaction != null ? (o.reaction / 1000).toFixed(2) + '秒' : '—'}{r.newRec && <span className="newrec">ベスト</span>}</dd></div>
+            )}
+            <div><dt>判断</dt><dd>{move}</dd></div>
+            <div><dt>やり過ごした</dt><dd>{o.stops} / {o.rustles}</dd></div>
+          </dl>
+          <p className="rs-meta">
+            {bearLine}持ち物：{names}
+            {p.best != null && !r.newRec ? '　｜　自己ベスト ' + (p.best / 1000).toFixed(2) + '秒' : ''}
+          </p>
+          <section className="prog rs-progress" aria-label="成長の記録">
+            <div className="progtop"><b>Lv.{lvShown.l} {lvShown.title}</b><span>+{r.gain} XP</span></div>
+            <div className="xpbar" aria-hidden="true"><i style={{ width: xpPct + '%', transition: xpAnimate ? undefined : 'none' }} /></div>
+            <div className="progsub">
+              <span>{r.after.toNext ? '次のレベルまで ' + r.after.toNext + ' XP' : '最高レベル'}</span>
+              <span>{p.streak >= 2 ? '連続クリア ' + p.streak : ''}</span>
+            </div>
+            {lvUp && <p className="lvup">{lvUp}</p>}
 
-        <section className="prog rs-progress" aria-label="成長の記録">
-          <div className="progtop"><b>Lv.{lvShown.l} {lvShown.title}</b><span>+{r.gain} XP</span></div>
-          <div className="xpbar" aria-hidden="true"><i style={{ width: xpPct + '%', transition: xpAnimate ? undefined : 'none' }} /></div>
-          <div className="progsub">
-            <span>{r.after.toNext ? '次のレベルまで ' + r.after.toNext + ' XP' : '最高レベル'}</span>
-            <span>{p.streak >= 2 ? '連続クリア ' + p.streak : ''}</span>
-          </div>
-          {lvUp && <p className="lvup">{lvUp}</p>}
+            {(r.freshBadges.length > 0 || r.freshDex.length > 0) && (
+              <ul className="newbadges" aria-live="polite">
+                {r.freshBadges.map((b) => (
+                  <li key={b.id} className="nb pop" style={{ animationDelay: nextDelay() }}>
+                    <span className="medal"><MedalIcon /></span>
+                    <div><b>バッジ獲得：{b.name}</b><span>{b.hint}</span></div>
+                  </li>
+                ))}
+                {r.freshDex.map((id) => {
+                  const d = dexEntry(id);
+                  if (!d) return null;
+                  return (
+                    <li key={id} className="nb pop" style={{ animationDelay: nextDelay() }}>
+                      <span className="medal dexpic">{PIC[d.pic]}</span>
+                      <div><b>図鑑に登録：{d.name}</b><span><Rarity star={d.star} /></span></div>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
 
-          {(r.freshBadges.length > 0 || r.freshDex.length > 0) && (
-            <ul className="newbadges" aria-live="polite">
-              {r.freshBadges.map((b) => (
-                <li key={b.id} className="nb pop" style={{ animationDelay: nextDelay() }}>
-                  <span className="medal"><MedalIcon /></span>
-                  <div><b>バッジ獲得：{b.name}</b><span>{b.hint}</span></div>
+            <div className="goal">
+              {next ? (
+                <>
+                  <div className="gtop"><span>次の目標　<b>{next.name}</b></span><span>{prog}</span></div>
+                  {m && <div className="gbar"><i style={{ width: goalPct + '%' }} /></div>}
+                  <span className="ghint">{next.hint}</span>
+                </>
+              ) : (
+                <div className="gtop"><b>すべてのバッジを集めた！</b></div>
+              )}
+            </div>
+          </section>
+
+          <details className="collection">
+            <summary><span>バッジ一覧</span><span>{BADGES.filter((b) => p.badges[b.id]).length} / {BADGES.length}</span></summary>
+            <ul className="badgelist">
+              {BADGES.map((b) => (
+                <li key={b.id}>
+                  <span className={'medal' + (p.badges[b.id] ? '' : ' off')}><MedalIcon /></span>
+                  <div>
+                    <b>{p.badges[b.id] ? b.name : '？？？'}</b>
+                    <span>{b.hint}{b.prog && !p.badges[b.id] ? '（' + b.prog(p) + '）' : ''}</span>
+                  </div>
                 </li>
               ))}
-              {r.freshDex.map((id) => {
-                const d = dexEntry(id);
-                if (!d) return null;
-                return (
-                  <li key={id} className="nb pop" style={{ animationDelay: nextDelay() }}>
-                    <span className="medal dexpic">{PIC[d.pic]}</span>
-                    <div><b>図鑑に登録：{d.name}</b><span><Rarity star={d.star} /></span></div>
-                  </li>
-                );
-              })}
             </ul>
-          )}
+          </details>
+        </aside>
+      </div>
 
-          <div className="goal">
-            {next ? (
-              <>
-                <div className="gtop"><span>次の目標　<b>{next.name}</b></span><span>{prog}</span></div>
-                {m && <div className="gbar"><i style={{ width: goalPct + '%' }} /></div>}
-                <span className="ghint">{next.hint}</span>
-              </>
-            ) : (
-              <div className="gtop"><b>すべてのバッジを集めた！</b></div>
-            )}
-          </div>
-        </section>
-
-        <details className="collection">
-          <summary><span>バッジ一覧</span><span>{BADGES.filter((b) => p.badges[b.id]).length} / {BADGES.length}</span></summary>
-          <ul className="badgelist">
-            {BADGES.map((b) => (
-              <li key={b.id}>
-                <span className={'medal' + (p.badges[b.id] ? '' : ' off')}><MedalIcon /></span>
-                <div>
-                  <b>{p.badges[b.id] ? b.name : '？？？'}</b>
-                  <span>{b.hint}{b.prog && !p.badges[b.id] ? '（' + b.prog(p) + '）' : ''}</span>
-                </div>
-              </li>
-            ))}
-          </ul>
-        </details>
-      </aside>
+      {/* ---- bottom: what next ---- */}
+      <footer className="startbar rs-actions">
+        <button className="btn btn-plain btn-again" type="button" onClick={onAgain}>同じ山でもう一度</button>
+        <button className="btn btn-primary btn-go" type="button" onClick={onNext}>次の山へ</button>
+      </footer>
     </section>
   );
 }

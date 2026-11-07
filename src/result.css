@@ -113,15 +113,6 @@
   .result .rs-actions{position:static;background:none;margin:0;padding:0}
   .rs-main>*,.rs-side>*{order:0}
 }
-/* ---------- phone held sideways: the wide two-column layout, so the report and the buttons share the short screen ---------- */
-@media (orientation:landscape) and (max-height:520px) and (min-width:700px){
-  .panel.result{column-gap:var(--sp-4);row-gap:0}
-  .rs-main{display:flex;flex-direction:column;gap:var(--sp-4);grid-column:1/8}
-  .rs-side{display:flex;flex-direction:column;gap:var(--sp-3);grid-column:8/13;position:sticky;top:var(--sp-3)}
-  .result .rs-actions{position:static;background:none;margin:0;padding:0}
-  .rs-main>*,.rs-side>*{order:0}
-  .rs-progress,.result .collection{grid-column:auto}
-}
 @media (max-width:380px){.result .badgelist{grid-template-columns:1fr}.rs-stats>div{padding:0 var(--sp-2)}}
 
 /* =====================================================================
@@ -169,3 +160,83 @@
 .result .rs-actions .btn-go{min-height:60px;font-size:var(--fs-lg)}
 .result .rs-actions .btn-again{border-radius:var(--r-md)}
 @media (prefers-reduced-motion:reduce){.missions li,.missions .ms-all{animation:none}}
+
+/* ---------- illustrations beside "見直したい行動" ---------- */
+.result details.item .rs-illustration{display:block;width:min(100%,200px);height:auto;aspect-ratio:3/2;margin:0 0 var(--sp-2)}
+
+
+/* =====================================================================
+   One card (2026-11 redesign): the verdict on top, then the review (left) and
+   progress (right), the buttons at the bottom. On a big screen it fits one screen,
+   the review scrolling inside its column; on small screens it stacks.
+   ===================================================================== */
+.panel.result.rs-card{position:relative;display:flex;flex-direction:column;align-items:stretch;gap:var(--sp-4);padding:var(--sp-5);overflow:hidden;
+  border-radius:var(--r-lg);border:1px solid var(--c-line-strong);background:var(--c-surface);box-shadow:var(--shadow-1)}
+.rs-card.r-S,.rs-card.r-A{background:radial-gradient(90% 60% at 50% 0%,var(--c-gold-soft),transparent 70%),var(--c-surface)}
+.rs-card.r-C{background:radial-gradient(90% 60% at 50% 0%,var(--c-bad-soft),transparent 70%),var(--c-surface)}
+.rs-card>*{min-width:0}
+
+/* top: centred verdict */
+.rs-card-top{position:relative;display:flex;flex-direction:column;align-items:center;gap:var(--sp-2);text-align:center}
+.rs-card .permit-band{align-self:stretch;display:flex;align-items:center;justify-content:space-between;gap:var(--sp-2);padding:0;background:none}
+.rs-card .permit-band{position:relative;padding-left:22px}
+.rs-card .permit-band::before{width:10px;border-radius:2px}
+.rs-card .permit-title{font-family:'Shippori Mincho B1',serif;font-size:var(--fs-lg);font-weight:800;letter-spacing:.12em;color:var(--c-text)}
+.rs-card .rs-cond{margin:calc(var(--sp-1) * -1) 0 0;font-size:var(--fs-sm)}
+.rs-card .rs-vbody{justify-content:center;text-align:left}
+.rs-card .rs-vtext h2{font-family:'Shippori Mincho B1',serif;font-size:clamp(26px,3.4vw,40px)}
+.rs-card.r-C .rs-vtext h2{color:var(--c-bad)}
+.rs-card .rank .letter.emb,.rs-card .letter.emb{width:96px;height:96px}
+.rs-card .letter.emb svg{width:96px;height:96px}
+
+/* the three goals, side by side as pills */
+.rs-card .missions{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:var(--sp-2);margin:0;padding:0;border:0;width:100%}
+.rs-card .missions li{flex:1 1 200px;max-width:320px;justify-content:center;padding:var(--sp-2) var(--sp-3);border-radius:var(--r-full);
+  border:1px solid var(--c-line);background:var(--c-sunk);color:var(--c-text);font-size:var(--fs-sm)}
+.rs-card .missions li.ok{border-color:rgba(238,139,116,.45)}
+.rs-card .missions li.ng{color:var(--c-text-2)}
+.rs-card .missions li.ok .ms-mark{color:var(--c-bad);background:rgba(238,139,116,.1)}
+.rs-card .missions li.ng .ms-mark{color:var(--c-text-2)}
+.rs-card .missions li.ng .ms-label{text-decoration-color:rgba(241,231,207,.4)}
+.rs-card .ms-all{margin:0;padding:4px 18px;border-radius:var(--r-full);background:var(--c-gold);color:var(--c-gold-ink);font-family:'Shippori Mincho B1',serif;
+  font-weight:800;letter-spacing:.2em;animation:msAll .5s cubic-bezier(.3,1.6,.5,1) both}
+.rs-card .rs-stats{padding:var(--sp-3);border:1px solid var(--c-line);border-radius:var(--r-md);background:var(--c-sunk)}
+.rs-card .rs-stats>div{align-items:center;padding:0 var(--sp-2)}
+.rs-card .rs-stats dd{font-size:var(--fs-md)}
+.rs-card .rs-meta{margin:calc(var(--sp-1) * -1) 0 0;text-align:center}
+
+/* middle: review | progress */
+.rs-card-body{display:flex;flex-direction:column;gap:var(--sp-4);padding-top:var(--sp-4);border-top:1.5px dashed var(--c-line)}
+.rs-card .rs-side,.rs-card .rs-review{grid-column:auto}
+.rs-card .rs-side{display:flex;flex-direction:column;gap:var(--sp-3);position:static}
+.rs-card .rs-side>*{order:0}
+.rs-card .rs-review{order:0}
+.rs-card .prog{margin:0}
+
+/* bottom: buttons, centred */
+.rs-card .rs-actions{display:flex;justify-content:center;gap:var(--sp-3);order:0}
+.rs-card .rs-actions .btn{flex:0 1 260px}
+
+@media (min-width:900px){
+  .rs-card-body{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:var(--sp-5)}
+  .rs-card .rs-side{padding-left:var(--sp-5);border-left:1px solid var(--c-line)}
+  .rs-card .rs-actions{position:static;margin:0;padding:0;background:none}
+}
+/* big screens: the whole card on one screen; the review scrolls inside its column */
+@media (min-width:900px) and (min-height:700px){
+  .rs-card .rs-review,.rs-card .rs-side{max-height:max(240px,calc(100dvh - 450px));overflow-y:auto;overscroll-behavior:contain;padding-right:var(--sp-2);scrollbar-width:thin}
+}
+/* phone held sideways: tighter, the verdict on one row, the card scrolls as one */
+@media (orientation:landscape) and (max-height:520px){
+  .panel.result.rs-card{padding:var(--sp-4);gap:var(--sp-3)}
+  .rs-card .letter.emb,.rs-card .letter.emb svg{width:76px;height:76px}
+  .rs-card .rs-vtext h2{font-size:26px}
+  .rs-card-body{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:var(--sp-4)}
+  .rs-card .rs-actions{position:sticky;bottom:0;margin:0 calc(var(--sp-4) * -1) calc(var(--sp-4) * -1);padding:var(--sp-2) var(--sp-4);
+    background:linear-gradient(to top,var(--c-surface) 75%,rgba(15,22,40,0))}
+}
+
+/* the drawing sits beside its text, so an open card stays short */
+.rs-card details.item .body:has(.rs-illustration){display:grid;grid-template-columns:150px minmax(0,1fr);column-gap:var(--sp-3);align-items:center}
+.rs-card details.item .body:has(.rs-illustration) .rs-illustration{grid-row:1/span 2;width:150px;margin:0}
+@media (max-width:520px){.rs-card details.item .body:has(.rs-illustration){display:block}.rs-card details.item .body .rs-illustration{width:min(100%,200px);margin:0 0 var(--sp-2)}}

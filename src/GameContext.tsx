@@ -8,7 +8,7 @@ import { drawStage } from './game/run';
 import { scoreRun, type RunResult } from './game/scoring';
 import { applyWeather, type Outcome, type RunSetup } from './game/types';
 import { loadProfile, saveProfile, type Profile } from './lib/profile';
-import { setSoundOn } from './lib/sound';
+import { audio, setSoundOn } from './lib/sound';
 
 interface Game {
   profile: Profile;
@@ -49,6 +49,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
   /** Starts (or restarts) a walk with the current mountain and tools. */
   const startRun = () => {
     if (!setup) { navigate('/stages'); return; }
+    audio(); /* this tap unlocks sound on phones, before the game's first sound */
     setPlay((prev) => ({
       key: (prev?.key ?? 0) + 1,
       engine: { cond: applyWeather(setup), wx: setup.wx?.id ?? null, tools: picked, level: lvInfo(profile.xp).l, knownDex: profile.dex },

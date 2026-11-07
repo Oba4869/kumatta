@@ -53,9 +53,8 @@ export const CONDS: Condition[] = [
   { id: 'fog', short: '霧', name: '霧の山道', desc: '霧で見通しが悪い。気づいたときには距離が近い', win: 1300, dist: 10, diff: 3, charge: 2200, lane: 30, avg: 0.33, lim: 3800 },
   {
     id: 'hokkaido', short: '北海道', name: '北海道の山', desc: 'ここにすむのはヒグマ。突進が速く、スプレーは3〜4mまで引き付ける', win: 1300, dist: 15, higuma: true, diff: 4, charge: 2000, lane: 28, avg: 0.32, lim: 3600,
+    /* Hokkaido is always the first-snow map (decided by the team, 2026-11-06) */
     wxs: [
-      { id: 'clear', name: '晴れ', desc: '', mods: {} },
-      { id: 'fog', name: '霧', desc: '霧で見通しが悪く、出会うときは距離が近い。', mods: { dist: 10 } },
       { id: 'snow', name: '初雪', desc: '雪が音を吸い、物音に気づきにくい。', mods: { quiet: true, win: 1000 } },
     ],
   },
